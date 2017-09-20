@@ -16,6 +16,6 @@ Devem haver: 1 mestre e 1 escravo.
 
 As mensagens transmitidas deverão ter o seguinte formato:
 
-| Inicio | Tamanho | Sequencia | Tipo | Dados | Paridade |
+| Inicio        | Tamanho       | Sequencia     | Tipo          | Dados                      | Paridade      |
 | ------------- | ------------- | ------------- | ------------- | -------------------------- | ------------- |
 
