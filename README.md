@@ -69,6 +69,10 @@ O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
 #### codigos de erro
 
+- 1: diretorio ou arquivo inexistente 
+- 2: acesso(permissao)
+- 3: espaço insuficiente
+
 ### Outras consideracoes
 
 O LLC(logical link control) é composto por: \
