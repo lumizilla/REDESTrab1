@@ -10,7 +10,8 @@ https://gitlab.c3sl.ufpr.br/lfo14/t1_redes1
 
 - Entrega na ultima semana de aula em uma terca feira \
 - Relatorio impresso com as escolhar feitas na implementacao \
-- Codigo por email apos a apresentacao
+- Codigo por email apos a apresentacao \
+- Deve ser feito em C ou C++
 
 ### Descricao do trabalho desenvolvida em sala de aula:
 
@@ -52,6 +53,14 @@ O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco
 O campo *dados* eh onde estarao os dados realmente uteis. Ver a explicacao do controle de fluxo abaixo. \
 O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
+### Especificacao dos comandos cd, ls, get, put e dos codigos de erro.
+
+#### cd
+#### ls
+#### get
+#### put 
+#### codigos de erro
+
 ### Outras consideracoes
 
 O LLC(logical link control) é composto por: \
@@ -61,4 +70,10 @@ O LLC(logical link control) é composto por: \
 -Deteccao de erros (Usa paridade vertical de 8 bits) 
 
 Protocolo: deve seguir o protocolo baseado no Kermit
+
+##### TIMEOUT EH OBRIGATORIO
+
+##### Cuidar com envio de arquivos binarios !! Testar isso !
+
+
 
