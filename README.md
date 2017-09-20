@@ -18,4 +18,4 @@ As mensagens transmitidas deverão ter o seguinte formato:
 
 | Inicio        | Tamanho       | Sequencia     | Tipo          | Dados                      | Paridade      |
 | ------------- | ------------- | ------------- | ------------- | -------------------------- | ------------- |
-
+| 8 bits        | 5 bits        | 6 bits        | 5 bits        | 0⁻31 bytes                 | 8 bits        |
