@@ -50,8 +50,19 @@ O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco
 | E | Erro |
 | F | NACK |
 
-O campo *dados* eh onde estarao os dados realmente uteis.
+O campo *dados* eh onde estarao os dados realmente uteis. Ver a explicacao do controle de fluxo abaixo.
 
 O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
-#### 
+### Outras consideracoes
+
+
+O LLC(logical link control) é composto por: 
+
+-Enquadramento (Inicio: campo inicio; Fim: campo tamanho)
+
+-Sequencializacao (campo sequencia)
+
+-Controle de fluxo (Apenas para dados, usa janela deslizante de tamanho 3 e repeticao seletiva)
+
+-Deteccao de erros (Usa paridade vertical de 8 bits)
