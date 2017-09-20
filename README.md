@@ -3,15 +3,19 @@
 ## *Implementar um FTP simplificado entre duas máquinas usando RawSockets*
 
 Este repositorio eh para guardar o primeiro trabalho da disciplina de REDES 1 \
-  Com muita gentileza, um colega me deu o link do trabalho dele para servir de inspiracao:
+Com muita gentileza, um colega me deu o link do trabalho dele para servir de inspiracao:
 https://gitlab.c3sl.ufpr.br/lfo14/t1_redes1
+
+### Entrega:
+
+- Entrega na ultima semana de aula em uma terca feira \
+- Relatorio impresso com as escolhar feitas na implementacao \
+- Codigo por email apos a apresentacao
 
 ### Descricao do trabalho desenvolvida em sala de aula:
 
-Devem haver: 1 mestre e 1 escravo.
-
-*Mestre:* O mestre é onde um usuário vai digitar os comandos.
-
+Devem haver: 1 mestre e 1 escravo. \
+*Mestre:* O mestre é onde um usuário vai digitar os comandos. \
 *Escravo:* O escravo corresponde ao servidor, que atende os comandos dados pelo Mestre.
 
 As mensagens transmitidas deverão ter o seguinte formato:
@@ -20,15 +24,11 @@ As mensagens transmitidas deverão ter o seguinte formato:
 | ------------- | ------------- | ------------- | ------------- | -------------------------- | ------------- |
 | 8 bits        | 5 bits        | 6 bits        | 5 bits        | 0⁻31 bytes                 | 8 bits        |
 
-Considerações sobre cada campo de mansagens:
-
-O campo *inicio* é composto pela sequência: 01111110. O fim das mensagens deve ser presvisto atraves do campo tamanho.
-
-O campo *tamanho* vai ter um numero entre 0 e 31 bytes que fazem referência somente ao campo de dados.
-
-O campo *sequencia* começa do 0, quando a sequência chega no máximo ela volta à 0. 
-
-O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco nao foram atribuidos a nada):
+Considerações sobre cada campo de mansagens: \
+O campo *inicio* é composto pela sequência: 01111110. O fim das mensagens deve ser presvisto atraves do campo tamanho. \
+O campo *tamanho* vai ter um numero entre 0 e 31 bytes que fazem referência somente ao campo de dados. \
+O campo *sequencia* começa do 0, quando a sequência chega no máximo ela volta à 0. \
+O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco nao foram atribuidos a nada): 
 
 | Tipo de mensagem | Descricao |
 | ---------------- | --------- |
@@ -49,18 +49,16 @@ O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco
 | E | Erro |
 | F | NACK |
 
-O campo *dados* eh onde estarao os dados realmente uteis. Ver a explicacao do controle de fluxo abaixo.
-
+O campo *dados* eh onde estarao os dados realmente uteis. Ver a explicacao do controle de fluxo abaixo. \
 O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
 ### Outras consideracoes
 
+O LLC(logical link control) é composto por: \
+-Enquadramento (Inicio: campo inicio; Fim: campo tamanho) \
+-Sequencializacao (campo sequencia) \
+-Controle de fluxo (Apenas para dados, usa janela deslizante de tamanho 3 e repeticao seletiva) \
+-Deteccao de erros (Usa paridade vertical de 8 bits) 
 
-O LLC(logical link control) é composto por: 
--Enquadramento (Inicio: campo inicio; Fim: campo tamanho)
+Protocolo: deve seguir o protocolo baseado no Kermit
 
--Sequencializacao (campo sequencia)
-
--Controle de fluxo (Apenas para dados, usa janela deslizante de tamanho 3 e repeticao seletiva)
-
--Deteccao de erros (Usa paridade vertical de 8 bits)
