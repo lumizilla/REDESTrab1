@@ -56,16 +56,16 @@ O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 ### Especificacao dos comandos cd, ls, get, put e dos codigos de erro.
 
 #### cd \
-![Alt text](images/cd.jpg?raw=true "Optional Title") 
+![cd](imagens/cd.jpg?raw=true "Optional Title") 
 
 #### ls \
-![Alt text](images/ls.jpg?raw=true "Optional Title")
+![ls](imagens/ls.jpg?raw=true "Optional Title")
 
 #### get \
-![Alt text](images/get.jpg?raw=true "Optional Title")
+![get](imagens/get.jpg?raw=true "Optional Title")
 
 #### put \ 
-![Alt text](images/put.jpg?raw=true "Optional Title")
+![put](imagens/put.jpg?raw=true "Optional Title")
 
 #### codigos de erro
 
