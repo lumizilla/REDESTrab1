@@ -58,7 +58,6 @@ O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
 
 O LLC(logical link control) é composto por: 
-
 -Enquadramento (Inicio: campo inicio; Fim: campo tamanho)
 
 -Sequencializacao (campo sequencia)
