@@ -8,9 +8,9 @@ https://gitlab.c3sl.ufpr.br/lfo14/t1_redes1
 
 ### Entrega:
 
-- Entrega na ultima semana de aula em uma terca feira \
-- Relatorio impresso com as escolhar feitas na implementacao \
-- Codigo por email apos a apresentacao \
+- Entrega na ultima semana de aula em uma terca feira 
+- Relatorio impresso com as escolhar feitas na implementacao 
+- Codigo por email apos a apresentacao 
 - Deve ser feito em C ou C++
 
 ### Descricao do trabalho desenvolvida em sala de aula:
@@ -55,16 +55,16 @@ O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
 
 ### Especificacao dos comandos cd, ls, get, put e dos codigos de erro.
 
-#### cd \
+#### cd 
 ![cd](imagens/cd.jpg?raw=true "Optional Title") 
 
-#### ls \
+#### ls 
 ![ls](imagens/ls.jpg?raw=true "Optional Title")
 
-#### get \
+#### get 
 ![get](imagens/get.jpg?raw=true "Optional Title")
 
-#### put \ 
+#### put 
 ![put](imagens/put.jpg?raw=true "Optional Title")
 
 #### codigos de erro
