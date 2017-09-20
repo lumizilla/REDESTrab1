@@ -7,7 +7,7 @@ Este repositorio eh para guardar o primeiro trabalho da disciplina de REDES 1
 Com muita gentileza, um colega me deu o link do trabalho dele para servir de inspiracao:
 https://gitlab.c3sl.ufpr.br/lfo14/t1_redes1
 
-#### *Descricao do trabalho desenvolvida em sala de aula:*
+### Descricao do trabalho desenvolvida em sala de aula:
 
 Devem haver: 1 mestre e 1 escravo.
 
@@ -53,3 +53,5 @@ O campo *tipo* deve seguir a seguinte tabela (os codigos com descricao em branco
 O campo *dados* eh onde estarao os dados realmente uteis.
 
 O campo *paridade* faz referencia aos campos: Tamanho, sequencia, tipo e dados.
+
+#### 
