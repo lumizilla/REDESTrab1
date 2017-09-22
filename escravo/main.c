@@ -57,12 +57,13 @@ int main(){
 
 	while(true){
 		//recebe mensagem
+		//TODO arrumar tamanho maximo das coisas
 		unsigned char dataRec[67];
 		int r = read(soquete, dataRec, 67);
 		printf("%d\n", r);
 		printf("%s\n", dataRec);
-		//define qual o tipo de mensagem e opera ela
-		//responde
+		//TODO define qual o tipo de mensagem e opera ela
+		//TODO responde
 		
 	}	
 }
