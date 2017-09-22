@@ -55,13 +55,28 @@ int main(){
         
         int soquete = ConexaoRawSocket("eth0");
 	
+	//TODO: arrumar tamanho maximo do comando e das outras coisas no codigo
 	char comando[100];
 
 	while(true){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
 		fgets(comando, sizeof(comando), stdin);
+		
+		//TODO: se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
+		
+		//TODO colocando no formato correto
+		
 		//enviando o comando
 		write(soquete, comando, 67);
+		
+		//ls
+			//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
+		//cd
+			//TODO
+		//put
+			//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
+		//get
+			//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
 	}
 }
