@@ -53,6 +53,17 @@ int ConexaoRawSocket(char *device)
 int main(){
         printf("\niniciando programa escravo(servidor)!\n");
         
-        int soquete = ConexaoRawSocket(char *device);
+        int soquete = ConexaoRawSocket("eth0");
+
+	while(true){
+		//recebe mensagem
+		unsigned char dataRec[67];
+		int r = read(soquete, dataRec, 67);
+		printf("%d\n", r);
+		printf("%s\n", dataRec);
+		//define qual o tipo de mensagem e opera ela
+		//responde
+		
+	}	
 }
 

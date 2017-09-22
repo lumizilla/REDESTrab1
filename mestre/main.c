@@ -53,5 +53,15 @@ int ConexaoRawSocket(char *device)
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");
         
-        int soquete = ConexaoRawSocket(char *device);
+        int soquete = ConexaoRawSocket("eth0");
+	
+	char comando[100];
+
+	while(true){
+		//lendo o comando
+		printf("Qual o seu comando?\n");
+		fgets(comando, sizeof(comando), stdin);
+		//enviando o comando
+		write(soquete, comando, 67);
+	}
 }
