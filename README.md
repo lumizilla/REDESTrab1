@@ -91,4 +91,7 @@ Protocolo: deve seguir o protocolo baseado no Kermit
 ##### Cuidar com envio de arquivos binarios !! Testar isso !
 
 
+sudo apt-get update
+sudo apt-get install build-essential
+sudo apt-get install gedit
 
