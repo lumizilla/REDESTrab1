@@ -90,9 +90,15 @@ Protocolo: deve seguir o protocolo baseado no Kermit
 
 ##### Cuidar com envio de arquivos binarios !! Testar isso !
 
-
+```
 sudo apt-get update
 sudo apt-get install git
 sudo apt-get install build-essential
 sudo apt-get install gedit
 sudo apt-get install tree
+
+para arrumar o erro de ontem adicionar o include:
+#include <arpa/inet.h>
+e mudar uma linha para:
+memcpy(ir.ifr_name, device, (size_t) sizeof(device));
+```
