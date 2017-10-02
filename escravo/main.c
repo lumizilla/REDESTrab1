@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 
 int ConexaoRawSocket(char *device)
