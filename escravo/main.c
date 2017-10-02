@@ -56,7 +56,7 @@ int ConexaoRawSocket(char *device)
 int main(){
         printf("\niniciando programa escravo(servidor)!\n");
         
-        int soquete = ConexaoRawSocket("eth0");
+        int soquete = ConexaoRawSocket("eno1");
 
 	while(true){
 		//recebe mensagem

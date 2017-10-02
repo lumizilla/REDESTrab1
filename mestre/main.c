@@ -56,7 +56,7 @@ int ConexaoRawSocket(char *device)
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");
         
-        int soquete = ConexaoRawSocket("eth0");
+        int soquete = ConexaoRawSocket("eno1");
 	
 	//TODO: arrumar tamanho maximo do comando e das outras coisas no codigo
 	char comando[100];
