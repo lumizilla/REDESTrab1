@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
+#include <arpa/inet.h>
+
 int ConexaoRawSocket(char *device)
 {
   int soquete;
@@ -22,7 +24,7 @@ int ConexaoRawSocket(char *device)
   }
 
   memset(&ir, 0, sizeof(struct ifreq));  	/*dispositivo eth0*/
-  memcpy(ir.ifr_name, device, sizeof(device));
+  memcpy(ir.ifr_name, device, (size_t) sizeof(device));
   if (ioctl(soquete, SIOCGIFINDEX, &ir) == -1) {
     printf("Erro no ioctl\n");
     exit(-1);
