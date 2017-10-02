@@ -100,4 +100,5 @@ sudo apt-get install gedit;
 sudo apt-get install tree;
 git config --global user.email "you@example.com";
 git config --global user.name "Your Name";
+RODAR AS COISAS COM SUDO
 ```
