@@ -45,3 +45,18 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
+int empacotaMsg(char *msg, char **mensagens, char *tipo, int *seq){
+        //Formato: INICIO | TAMANHO | SEQUENCIA | TIPO | DADOS | PARIDADE
+	tamMsg = sizeof(*msg);
+	for(i = 0; i < ceil(tamMsg/DATA_SIZE); i++){
+		//EMPACOTAR AS MSGS
+		//Inicio tem 8 bits
+		mensagens[i][0] = 0x7E;
+                //Tamanho tem 5 bits
+                //Sequencia tem 6 bits e vai ser referente ao i
+                //Tipo tem 5 bits, portanto somando tam+seq+tipo temos 16 bits, 2 bytes
+                //TODO mensagem.h e mensagem.c do trabalho da marcela
+        }   
+        return ceil(tamMsg/DATA_SIZE);
+}
+

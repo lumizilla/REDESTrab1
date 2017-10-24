@@ -20,4 +20,8 @@
 //tamanho maximo do campo de dados
 #define DATA_SIZE 31
 
-
+typedef struct controle {
+	unsigned short tam : 5,
+		seq : 6,
+		tipo : 5;
+}controle;
