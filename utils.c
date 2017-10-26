@@ -73,7 +73,7 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	
 	// empacotar a msg
 	for(int i = 3; i < tam+3; i++){
-		msgEnviar[i] = msg[i-3]
+		msgEnviar[i] = msg[i-3];
 	}
 
 	//TODO fazer a paridade
@@ -89,4 +89,5 @@ int desempacotaMsg(char *msgRecebida){
 	//TODO retornar dados extraidos
 	//TODO retornar tipo da mensagem
 	//TODO retornar o numero de sequencia
+	return 0;
 }

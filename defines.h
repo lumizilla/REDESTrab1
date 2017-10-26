@@ -11,7 +11,6 @@
 #include <stdbool.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
-#include "utils.c"
 
 //esse eh o tamanho maximo de uma mensagem em bytes, 
 //considerando que tenham 31 bytes de dados
