@@ -1,4 +1,5 @@
 #include "../utils.c"
+#include "../defines.h"
 //um char tem 1 byte = 8 bits
 
 int main(){
