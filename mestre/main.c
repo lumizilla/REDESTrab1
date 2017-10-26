@@ -3,14 +3,20 @@
 
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");        
-        
 	int soquete = ConexaoRawSocket("eno1");
+	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
+	//comando sem ser empacotado
 	char *comando_usuario;
+	//para guardar o input do usuario
 	char *subs[3];
 	unsigned char mensagens[MAX_MSG][DATA_SIZE];
-	char *tipo = "";
-	int sequencia = 0;
+	//tipo de mensagem a ser enviada
+	short tipo = 0;
+	//numero de sequencia da mensagem
+	short sequencia = 0;
+	//tamanho da mensagem a ser enviada
+	short tam = 0;
 
 	while(true){
 		//lendo o comando
@@ -18,7 +24,7 @@ int main(){
 		fgets(comando_usuario, MAX_INPUT, stdin);
 		//separando o comando em substrings
 		//e limpando possivel lixos
-		tipo = ""
+		tipo = "";
 		subs[0] = "";
 		subs[1] = "";
 		subs[2] = "";
@@ -27,16 +33,44 @@ int main(){
 		if(subs[0] != "cd" && subs[0] != "ls" && subs[0] != "get" && subs[0] != "put"){
 			printf("ERRO: comando invalido\n");
 		}
-		else{
-			//TODO empacotar mensagem no formato correto
-			tipo = subs[0];
-
-			numMensagens = empacotaMsg(comando_usuario, mensagens, tipo, &sequencia);
-			//enviar mensagem ao servidor
-			for(i = 0; i < numMensagens; i++){
-				write(soquete, mensagens[i], MSG_SIZE);
+		else{	
+			//empacotar mensagem no formato correto
+			switch(subs[0]){
+				case "cd":
+					tipo = 6; 
+					break;
+				case "ls":
+					tipo = 7;
+					break;
+				case "get":
+					tipo = 8;
+					break;
+				case "put":
+					tipo = 9;
+					break;
 			}
-
+			//descobre o numero de mensagens que precisarao ser enviadas para isso
+			tamMsg = sizeof(comando_usuario);
+			numMensagens = ceil(tamMsg/DATA_SIZE);
+			//empacota e envia cada pedaco
+			char *aux;
+			int resto = tamMsg%DATA_SIZE;
+			for(int i = 0; i < (tamMsg - resto); i++){
+				//copiando o maximo que da em comando
+				aux[i%tamMsg] = comando_usuario[i];
+				if((i%tamMsg == 0) && (i != 0)){
+					strncpy(comando, aux, DATA_SIZE);
+					empacotaMsg(comando, comando, tipo, sequencia, tam);	
+					write(soquete, comando, MSG_SIZE);
+					sequencia = aumentaSeq(sequencia);
+				}
+			}
+			
+			//TODO empacota sobra
+			if(resto != 0){
+				printf("tem resto\n");
+			}
+			printf("acabou de empacotar\n");
 			//TODO esperar resposta de acordo com o comando previamente enviado
 			//ls
 				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela

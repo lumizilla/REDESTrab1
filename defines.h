@@ -4,6 +4,7 @@
 #include <net/ethernet.h> 
 #include <linux/if_packet.h> 
 #include <linux/if.h> 
+#include <netinet/in.h>
 #include <stdlib.h> 
 #include <string.h> 
 #include <stdio.h> 
@@ -19,6 +20,9 @@
 
 //tamanho maximo do campo de dados
 #define DATA_SIZE 31
+
+//tamanho maximo do numero de sequencia
+#define SEQ_MAX 200
 
 typedef struct controle {
 	unsigned short tam : 5,
