@@ -11,6 +11,7 @@
 #include <stdbool.h> 
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <math.h>
 
 //esse eh o tamanho maximo de uma mensagem em bytes, 
 //considerando que tenham 31 bytes de dados
@@ -23,6 +24,8 @@
 //tamanho maximo do numero de sequencia
 #define SEQ_MAX 200
 
+//tamanho maximo do comando de input do mestre
+#define MAX_INPUT 200
 typedef struct controle {
 	unsigned short tam : 5,
 		seq : 6,

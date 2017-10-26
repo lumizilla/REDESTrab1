@@ -9,22 +9,25 @@ int main(){
 	//comando sem ser empacotado
 	char *comando_usuario;
 	//para guardar o input do usuario
-	char *subs[3];
-	unsigned char mensagens[MAX_MSG][DATA_SIZE];
+	char *subs;
+	unsigned char mensagens[SEQ_MAX][DATA_SIZE];
 	//tipo de mensagem a ser enviada
 	short tipo = 0;
 	//numero de sequencia da mensagem
 	short sequencia = 0;
-	//tamanho da mensagem a ser enviada
+	//numero de pedacos de mensagem a serem enviados
+	int numMensagens = 0;
+	//tamanho do pedaco mensagem a ser enviada
 	short tam = 0;
-
+	//tamanho da mensagem inteira
+	int tamMsg = 0;
 	while(true){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
 		fgets(comando_usuario, MAX_INPUT, stdin);
 		//separando o comando em substrings
 		//e limpando possivel lixos
-		tipo = "";
+		tipo = 0;
 		subs[0] = "";
 		subs[1] = "";
 		subs[2] = "";
@@ -35,19 +38,17 @@ int main(){
 		}
 		else{	
 			//empacotar mensagem no formato correto
-			switch(subs[0]){
-				case "cd":
-					tipo = 6; 
-					break;
-				case "ls":
-					tipo = 7;
-					break;
-				case "get":
-					tipo = 8;
-					break;
-				case "put":
-					tipo = 9;
-					break;
+			if(subs[0] == "cd"){
+				tipo = 6; 
+			}
+			else if(subs[0] == "ls"){
+				tipo = 7;
+			}
+			else if(subs[0] == "get"){
+				tipo = 8;
+			}
+			else if(subs[0] == "put"){
+				tipo = 9;
 			}
 			//descobre o numero de mensagens que precisarao ser enviadas para isso
 			tamMsg = sizeof(comando_usuario);
