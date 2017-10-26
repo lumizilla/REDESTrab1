@@ -52,7 +52,7 @@ int main(){
 			}
 			//descobre o numero de mensagens que precisarao ser enviadas para isso
 			tamMsg = sizeof(comando_usuario);
-			numMensagens = ceil(tamMsg/DATA_SIZE);
+			numMensagens = ceil((tamMsg/DATA_SIZE));
 			//empacota e envia cada pedaco
 			char *aux;
 			int resto = tamMsg%DATA_SIZE;
