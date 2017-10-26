@@ -26,8 +26,8 @@
 
 //tamanho maximo do comando de input do mestre
 #define MAX_INPUT 200
-typedef struct controle {
+typedef struct cont {
 	unsigned short tam : 5,
 		seq : 6,
 		tipo : 5;
-}
+}controle;
