@@ -19,6 +19,17 @@ https://gitlab.c3sl.ufpr.br/mro15/ftp-simplificado
 - Codigo por email apos a apresentacao 
 - Deve ser feito em C ou C++
 
+## Fazer isso aqui depois de bootar:
+```
+sudo apt-get update;
+sudo apt-get install git -y;
+sudo apt-get install build-essential -y;
+sudo apt-get install gedit -y;
+sudo apt-get install tree -y;
+git config --global user.email "you@example.com";
+git config --global user.name "Your Name";
+RODAR AS COISAS COM SUDO
+```
 ### Descricao do trabalho desenvolvida em sala de aula:
 
 Devem haver: 1 mestre e 1 escravo. \
@@ -94,14 +105,4 @@ Protocolo: deve seguir o protocolo baseado no Kermit
 ##### Cuidar com envio de arquivos binarios !! Testar isso !
 
 
-Fazer isso aqui depois de bootar:
-```
-sudo apt-get update;
-sudo apt-get install git;
-sudo apt-get install build-essential;
-sudo apt-get install gedit;
-sudo apt-get install tree;
-git config --global user.email "you@example.com";
-git config --global user.name "Your Name";
-RODAR AS COISAS COM SUDO
-```
+
