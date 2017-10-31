@@ -8,8 +8,12 @@ int main(){
 	unsigned char comando[DATA_SIZE];
 	//comando sem ser empacotado
 	char comando_usuario[MAX_INPUT];
+	//var auxiliar que salva o valor de comando usuario
+	char comando_salvo[MAX_INPUT];
 	//para guardar o input do usuario
-	char *subs;
+	char *input;
+	char *subs[3];
+
 	unsigned char mensagens[SEQ_MAX][DATA_SIZE];
 	//tipo de mensagem a ser enviada
 	short tipo = 0;
@@ -27,43 +31,48 @@ int main(){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
 		fgets(comando_usuario, MAX_INPUT, stdin);
+		//salvando comando_usuario em outra variavel
+		strcpy(comando_salvo, comando_usuario);
 		//separando o comando em substrings
 		//e limpando possivel lixos
 		tipo = 0;
-		//subs[0] = "";
-		//subs[1] = "";
-		//subs[2] = "";
+		subs[0] = "";
+		subs[1] = "";
+		subs[2] = "";
 
 		/*getting the first substring*/
-		subs = strtok(comando_usuario, " ");
-		printf("%d\n", sizeof(subs)/sizeof(subs[0]));
+		input = strtok(comando_usuario, " ");
 		/*walking trough the other substrings*/
-		while(subs != NULL){
-			printf("%s\n", subs);
-			subs = strtok(NULL, " ");
+		int i = 0;		
+		while(input != NULL){
+			subs[i] = input;
+			input = strtok(NULL, " ");
+			i = i+1;
 		}
-		printf("aqui\n");
+		printf("%s\n", subs[0]);
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
-		/*if(subs[0] != "cd" && subs[0] != "ls" && subs[0] != "get" && subs[0] != "put"){
+		if(strcmp(subs[0],"cd") != 0 && strcmp(subs[0],"ls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
 		else{	
 			//empacotar mensagem no formato correto
-			if(subs[0] == "cd"){
+			if(strcmp(subs[0], "cd") == 0){
 				tipo = 6; 
 			}
-			else if(subs[0] == "ls"){
+			else if(strcmp(subs[0], "ls") == 0){
 				tipo = 7;
 			}
-			else if(subs[0] == "get"){
+			else if(strcmp(subs[0], "get") == 0){
 				tipo = 8;
 			}
-			else if(subs[0] == "put"){
+			else if(strcmp(subs[0], "put") == 0){
 				tipo = 9;
 			}
 			//descobre o numero de mensagens que precisarao ser enviadas para isso
-			tamMsg = sizeof(comando_usuario);
+			printf("%s\n", comando_salvo);
+			tamMsg = strlen(comando_salvo);
 			numMensagens = ceil((tamMsg/DATA_SIZE));
+			printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
 			//empacota e envia cada pedaco
 			char *aux;
 			int resto = tamMsg%DATA_SIZE;
@@ -72,7 +81,9 @@ int main(){
 				aux[i%tamMsg] = comando_usuario[i];
 				if((i%tamMsg == 0) && (i != 0)){
 					strncpy(comando, aux, DATA_SIZE);
-					empacotaMsg(comando, comando, tipo, sequencia, tam);	
+					empacotaMsg(comando, comando, tipo, sequencia, tam);
+					printf("depois de empacota\n");
+					fflush(stdout);	
 					write(soquete, comando, MSG_SIZE);
 					sequencia = aumentaSeq(sequencia);
 				}
@@ -92,6 +103,6 @@ int main(){
 				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
 			//get
 				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
-		}*/
+		}
 	}
 }
