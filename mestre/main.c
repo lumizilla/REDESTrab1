@@ -7,7 +7,7 @@ int main(){
 	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
 	//comando sem ser empacotado
-	char *comando_usuario;
+	char comando_usuario[MAX_INPUT];
 	//para guardar o input do usuario
 	char *subs;
 	unsigned char mensagens[SEQ_MAX][DATA_SIZE];
@@ -21,17 +21,28 @@ int main(){
 	short tam = 0;
 	//tamanho da mensagem inteira
 	int tamMsg = 0;
+
+	const char s[2] = " ";
 	while(true){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
 		fgets(comando_usuario, MAX_INPUT, stdin);
+		printf("%s\n", comando_usuario);
 		//separando o comando em substrings
 		//e limpando possivel lixos
 		tipo = 0;
-		subs[0] = "";
-		subs[1] = "";
-		subs[2] = "";
-		subs = strtok(comando_usuario, " ");
+		//subs[0] = "";
+		//subs[1] = "";
+		//subs[2] = "";
+
+		/*getting the first substring*/
+		subs = strtok(comando_usuario, s);
+		/*walking trough the other substrings*/
+		while(subs != NULL){
+			printf("-%s", subs);
+			subs = strtok(NULL, s);
+		}
+		printf("aqui");
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
 		if(subs[0] != "cd" && subs[0] != "ls" && subs[0] != "get" && subs[0] != "put"){
 			printf("ERRO: comando invalido\n");
