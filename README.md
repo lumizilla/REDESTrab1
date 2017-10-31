@@ -26,6 +26,7 @@ sudo apt-get install git -y;
 sudo apt-get install build-essential -y;
 sudo apt-get install gedit -y;
 sudo apt-get install tree -y;
+git clone https://github.com/lumizila/REDESTrab1.git;
 git config --global user.email "you@example.com";
 git config --global user.name "Your Name";
 RODAR AS COISAS COM SUDO
