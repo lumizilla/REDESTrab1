@@ -27,7 +27,6 @@ int main(){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
 		fgets(comando_usuario, MAX_INPUT, stdin);
-		printf("%s\n", comando_usuario);
 		//separando o comando em substrings
 		//e limpando possivel lixos
 		tipo = 0;
@@ -36,15 +35,16 @@ int main(){
 		//subs[2] = "";
 
 		/*getting the first substring*/
-		subs = strtok(comando_usuario, s);
+		subs = strtok(comando_usuario, " ");
+		printf("%d\n", sizeof(subs)/sizeof(subs[0]));
 		/*walking trough the other substrings*/
 		while(subs != NULL){
-			printf("-%s", subs);
-			subs = strtok(NULL, s);
+			printf("%s\n", subs);
+			subs = strtok(NULL, " ");
 		}
-		printf("aqui");
+		printf("aqui\n");
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
-		if(subs[0] != "cd" && subs[0] != "ls" && subs[0] != "get" && subs[0] != "put"){
+		/*if(subs[0] != "cd" && subs[0] != "ls" && subs[0] != "get" && subs[0] != "put"){
 			printf("ERRO: comando invalido\n");
 		}
 		else{	
@@ -92,6 +92,6 @@ int main(){
 				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
 			//get
 				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
-		}
+		}*/
 	}
 }
