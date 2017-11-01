@@ -53,6 +53,8 @@ int aumentaSeq (int seq){
 }
 
 int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
+	printf("dentro de empacota\n");
+	fflush(stdout);
 	controle ctrl;
 	//um unsigned short ou short then 2 bytes
 	ctrl.tam = (unsigned short) tam;

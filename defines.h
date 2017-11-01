@@ -19,7 +19,6 @@
 #define MSG_SIZE 35
 
 //tamanho maximo do campo de dados
-//TODO ARRUMAR ISSO LEMBRANDO QUE SAO 31 BYTES, NAO BITS
 #define DATA_SIZE 31
 
 //tamanho maximo do numero de sequencia

@@ -6,6 +6,8 @@ int main(){
 	int soquete = ConexaoRawSocket("eno1");
 	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
+	//mensagem ja empacotada, pronta a ser enviada
+	unsigned char mensagem[MSG_SIZE];
 	//comando sem ser empacotado
 	char comando_usuario[MAX_INPUT];
 	//var auxiliar que salva o valor de comando usuario
@@ -74,24 +76,41 @@ int main(){
 			numMensagens = ceil((tamMsg/DATA_SIZE));
 			printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
 			//empacota e envia cada pedaco
-			char *aux;
+			char aux[DATA_SIZE];
 			int resto = tamMsg%DATA_SIZE;
-			for(int i = 0; i < (tamMsg - resto); i++){
+			for(i = 0; i < (tamMsg - resto); i++){
 				//copiando o maximo que da em comando
-				aux[i%tamMsg] = comando_usuario[i];
-				if((i%tamMsg == 0) && (i != 0)){
+				if(((i%DATA_SIZE) == 0) && (i != 0)){
 					strncpy(comando, aux, DATA_SIZE);
-					empacotaMsg(comando, comando, tipo, sequencia, tam);
-					printf("depois de empacota\n");
+					printf("comando: %s\n", comando);
+					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
+					printf("%s\n", mensagem);
 					fflush(stdout);	
 					write(soquete, comando, MSG_SIZE);
 					sequencia = aumentaSeq(sequencia);
 				}
+				aux[i%DATA_SIZE] = comando_salvo[i];
 			}
-			
+			//empacotando o ultimo pacote
+			if(((i%DATA_SIZE) == 0) && (i != 0)){
+					strncpy(comando, aux, DATA_SIZE);
+					printf("comando: %s\n", comando);
+					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
+					printf("%s\n", mensagem);
+					fflush(stdout);	
+					write(soquete, comando, MSG_SIZE);
+					sequencia = aumentaSeq(sequencia);
+			}
 			//TODO empacota sobra
 			if(resto != 0){
 				printf("tem resto\n");
+				for(i = 0; i < resto; i++){
+					aux[i] = comando_salvo[tamMsg+i];
+				}
+				printf("%s\n", aux);
+				fflush(stdout);
+				
+				sequencia = aumentaSeq(sequencia);
 			}
 			printf("acabou de empacotar\n");
 			//TODO esperar resposta de acordo com o comando previamente enviado
