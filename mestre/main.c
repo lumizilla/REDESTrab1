@@ -29,6 +29,8 @@ int main(){
 	int tamMsg = 0;
 
 	const char s[2] = " ";
+
+	char aux[DATA_SIZE];
 	while(true){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
@@ -76,7 +78,7 @@ int main(){
 			numMensagens = ceil((tamMsg/DATA_SIZE));
 			printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
 			//empacota e envia cada pedaco
-			char aux[DATA_SIZE];
+
 			int resto = tamMsg%DATA_SIZE;
 			for(i = 0; i < (tamMsg - resto); i++){
 				//copiando o maximo que da em comando
@@ -103,13 +105,13 @@ int main(){
 			}
 			//TODO empacota sobra
 			if(resto != 0){
-				printf("tem resto\n");
-				for(i = 0; i < resto; i++){
-					aux[i] = comando_salvo[tamMsg+i];
-				}
-				printf("%s\n", aux);
-				fflush(stdout);
-				
+				printf("%d\n", strlen(comando_salvo));
+				for(i = resto-1; i >= 0; i--){
+					printf("tem resto, %d\n", tamMsg-resto+i);
+					aux[i] = comando_salvo[tamMsg-resto+i];
+					printf("aux = %s\n", aux);
+					fflush(stdout);
+				}	
 				sequencia = aumentaSeq(sequencia);
 			}
 			printf("acabou de empacotar\n");
