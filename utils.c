@@ -78,8 +78,12 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 		msgEnviar[i] = msg[i-3];
 	}
 
-	//TODO fazer a paridade
-
+	//TODO a paridade faz referencia aos campos: Tamanho, sequencia, tipo e dados. Tem 8 bits
+	char paridade;	
+	for(int i = 1; i < tam+3; i++){
+		
+	}
+	msgEnviar[tam+3] = paridade;
         return 0;
 }
 
