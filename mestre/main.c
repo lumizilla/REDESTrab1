@@ -103,18 +103,18 @@ int main(){
 					write(soquete, comando, MSG_SIZE);
 					sequencia = aumentaSeq(sequencia);
 			}
-			//TODO empacota sobra
+			//empacota sobra
 			if(resto != 0){
-				printf("%d\n", strlen(comando_salvo));
 				for(i = resto-1; i >= 0; i--){
-					printf("tem resto, %d\n", tamMsg-resto+i);
 					aux[i] = comando_salvo[tamMsg-resto+i];
-					printf("aux = %s\n", aux);
-					fflush(stdout);
-				}	
+				}
+				strncpy(comando, aux, resto);
+				char msgResto[resto];
+				empacotaMsg(comando, msgResto, tipo, sequencia, resto);
+				write(soquete, comando, MSG_SIZE);	
 				sequencia = aumentaSeq(sequencia);
 			}
-			printf("acabou de empacotar\n");
+
 			//TODO esperar resposta de acordo com o comando previamente enviado
 			//ls
 				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
