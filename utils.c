@@ -53,8 +53,6 @@ int aumentaSeq (int seq){
 }
 
 int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
-	printf("dentro de empacota\n");
-	fflush(stdout);
 	controle ctrl;
 	//um unsigned short ou short then 2 bytes
 	ctrl.tam = (unsigned short) tam;
@@ -78,11 +76,28 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 		msgEnviar[i] = msg[i-3];
 	}
 
-	//TODO a paridade faz referencia aos campos: Tamanho, sequencia, tipo e dados. Tem 8 bits
-	char paridade;	
-	for(int i = 1; i < tam+3; i++){
-		
+	//a paridade faz referencia aos campos: Tamanho, sequencia, tipo e dados. Eh vertical e Tem 8 bits
+	char paridade = 0x00;
+	char atual;
+	char anterior;	
+	char mascaras[8] = {0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00};
+	char mascara = 0x01;
+	for(int j = 0; j < 8; j++){
+		anterior = msgEnviar[1];
+		for(int i = 2; i < tam + 3; i++){
+			atual = msgEnviar[i];			
+			//Irei fazer um AND bit a bit dos chars, comecando do bit mais a direita
+			//primeiro aplico uma mascara aos chars, para fazer and so do que eu quero
+			atual = atual & mascara;
+			anterior = anterior & mascara;
+			anterior = atual & anterior;		
+		}
+		paridade = anterior & mascara;
+		//atualizando a mascara
+		mascara = mascaras[j];
+		printf("%d", mascaras[j]);
 	}
+	printf("%s", paridade);
 	msgEnviar[tam+3] = paridade;
         return 0;
 }

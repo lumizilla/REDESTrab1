@@ -53,7 +53,6 @@ int main(){
 			input = strtok(NULL, " ");
 			i = i+1;
 		}
-		printf("%s\n", subs[0]);
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
 		if(strcmp(subs[0],"cd") != 0 && strcmp(subs[0],"ls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
@@ -73,7 +72,6 @@ int main(){
 				tipo = 9;
 			}
 			//descobre o numero de mensagens que precisarao ser enviadas para isso
-			printf("%s\n", comando_salvo);
 			tamMsg = strlen(comando_salvo);
 			numMensagens = ceil((tamMsg/DATA_SIZE));
 			printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
@@ -111,7 +109,9 @@ int main(){
 				strncpy(comando, aux, resto);
 				char msgResto[resto];
 				empacotaMsg(comando, msgResto, tipo, sequencia, resto);
-				write(soquete, comando, MSG_SIZE);	
+				printf("%s\n", msgResto);
+				fflush(stdout);
+				write(soquete, msgResto, MSG_SIZE);	
 				sequencia = aumentaSeq(sequencia);
 			}
 
