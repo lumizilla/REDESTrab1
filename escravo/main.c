@@ -23,9 +23,17 @@ int main(){
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
 		//-2 paridade não confere.
+		//se inicio nao confere soh ignora a mensagem
 		//confere se paridade incorreta responder com NACK
-		if(){
-
+		if(status == -2){
+			//empacota NACK, NO CAMPO DE DADOS O NUMERO DE SEQ DA MENSAGEM
+			unsigned char msgEnviar[MSG_SIZE];
+			unsigned char msg[DATA_SIZE] = itoa(seqRec);
+			empacotaMsg(msg, msgEnviar, 15, sequencia, DATA_SIZE);
+			printf("%s\n", msgEnviar);
+			fflush(stdout);
+			write(soquete, msgEnviar, MSG_SIZE); 
+			sequencia = aumentaSeq(sequencia);
 		}
 		//confere o tamanho da mensagem
 		//confere qual a sequencia da mensagem
