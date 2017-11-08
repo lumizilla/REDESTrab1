@@ -62,7 +62,7 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
         //Formato: INICIO | TAMANHO | SEQUENCIA | TIPO | DADOS | PARIDADE
 	//Inicio tem 8 bits
 	msgEnviar[0] = 0x7E;
-
+	
         //Tamanho tem 5 bits
         //Sequencia tem 6 bits e vai ser referente ao i
         //Tipo tem 5 bits, portanto somando tam+seq+tipo temos 16 bits, 2 bytes
@@ -70,8 +70,10 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	char *aux = (char*) (&ctrl);
 	msgEnviar[1] = aux[0];
 	msgEnviar[2] = aux[1];
-	
+
+	//segfault nesta parte 
 	// empacotar a msg
+	
 	for(int i = 3; i < tam+3; i++){
 		msgEnviar[i] = msg[i-3];
 	}
@@ -80,24 +82,13 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	char paridade = 0x00;
 	char atual;
 	char anterior;	
-	char mascaras[8] = {0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x00};
-	char mascara = 0x01;
-	for(int j = 0; j < 8; j++){
-		anterior = msgEnviar[1];
-		for(int i = 2; i < tam + 3; i++){
-			atual = msgEnviar[i];			
-			//Irei fazer um AND bit a bit dos chars, comecando do bit mais a direita
-			//primeiro aplico uma mascara aos chars, para fazer and so do que eu quero
-			atual = atual & mascara;
-			anterior = anterior & mascara;
-			anterior = atual & anterior;		
-		}
-		paridade = anterior & mascara;
-		//atualizando a mascara
-		mascara = mascaras[j];
-		printf("%d", mascaras[j]);
+	anterior = msgEnviar[1];
+	for(int i = 2; i < tam + 3; i++){
+		atual = msgEnviar[i];			
+		//Irei fazer um AND dos chars
+		anterior = atual && anterior;
 	}
-	printf("%s", paridade);
+	paridade = anterior;
 	msgEnviar[tam+3] = paridade;
         return 0;
 }

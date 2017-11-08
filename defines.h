@@ -21,6 +21,9 @@
 //tamanho maximo do campo de dados
 #define DATA_SIZE 31
 
+//tamanho do overload das mensagens
+#define OVERLOAD_SIZE 4 
+
 //tamanho maximo do numero de sequencia
 #define SEQ_MAX 200
 

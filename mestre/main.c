@@ -6,7 +6,7 @@ int main(){
 	int soquete = ConexaoRawSocket("eno1");
 	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
-	//mensagem ja empacotada, pronta a ser enviada
+	//mensagem ja empacotada de tamanho maximo, pronta a ser enviada
 	unsigned char mensagem[MSG_SIZE];
 	//comando sem ser empacotado
 	char comando_usuario[MAX_INPUT];
@@ -26,11 +26,8 @@ int main(){
 	//tamanho do pedaco mensagem a ser enviada
 	short tam = 0;
 	//tamanho da mensagem inteira
-	int tamMsg = 0;
+	short tamMsg = 0;
 
-	const char s[2] = " ";
-
-	char aux[DATA_SIZE];
 	while(true){
 		//lendo o comando
 		printf("Qual o seu comando?\n");
@@ -71,10 +68,46 @@ int main(){
 			else if(strcmp(subs[0], "put") == 0){
 				tipo = 9;
 			}
-			//descobre o numero de mensagens que precisarao ser enviadas para isso
+
+			tamMsg = strlen(comando_salvo);
+			if(tamMsg <= DATA_SIZE){
+				for(i = 0; i < tamMsg; i++){
+					comando[i] = comando_salvo[i];
+				}
+				
+				//mensagem empacotada de tamanho certo
+				char msgResto[tamMsg+OVERLOAD_SIZE];
+				empacotaMsg(comando, msgResto, tipo, sequencia, tamMsg);
+				printf("%s\n", msgResto);
+				fflush(stdout);
+				write(soquete, msgResto, (tamMsg+OVERLOAD_SIZE));	
+				sequencia = aumentaSeq(sequencia);
+
+				//TODO esperar resposta de acordo com o comando previamente enviado
+			//ls
+				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
+			//cd
+				//basicamente nao faz nada
+			//put
+				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
+			//get
+				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
+			//ERRO
+				//TODO printar erro
+
+			}
+			else{
+				printf("ERRO: O comando eh muito grande e nao cabe em uma mensagem.\n");
+			}
+		}
+	}
+}
+
+/*
+//descobre o numero de mensagens que precisarao ser enviadas para isso
 			tamMsg = strlen(comando_salvo);
 			numMensagens = ceil((tamMsg/DATA_SIZE));
-			printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
+			//printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
 			//empacota e envia cada pedaco
 
 			int resto = tamMsg%DATA_SIZE;
@@ -82,7 +115,6 @@ int main(){
 				//copiando o maximo que da em comando
 				if(((i%DATA_SIZE) == 0) && (i != 0)){
 					strncpy(comando, aux, DATA_SIZE);
-					printf("comando: %s\n", comando);
 					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
 					printf("%s\n", mensagem);
 					fflush(stdout);	
@@ -94,7 +126,6 @@ int main(){
 			//empacotando o ultimo pacote
 			if(((i%DATA_SIZE) == 0) && (i != 0)){
 					strncpy(comando, aux, DATA_SIZE);
-					printf("comando: %s\n", comando);
 					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
 					printf("%s\n", mensagem);
 					fflush(stdout);	
@@ -119,11 +150,12 @@ int main(){
 			//ls
 				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
 			//cd
-				//TODO
+				//basicamente nao faz nada
 			//put
 				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
 			//get
 				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
+			//ERRO
+				//TODO printar erro
 		}
-	}
-}
+*/
