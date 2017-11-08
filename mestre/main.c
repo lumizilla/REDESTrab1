@@ -16,7 +16,6 @@ int main(){
 	char *input;
 	char *subs[3];
 
-	unsigned char mensagens[SEQ_MAX][DATA_SIZE];
 	//tipo de mensagem a ser enviada
 	short tipo = 0;
 	//numero de sequencia da mensagem

@@ -3,29 +3,65 @@
 int main(){
         printf("\niniciando programa escravo(servidor)!\n");
         int soquete = ConexaoRawSocket("eno1");
+	//tipo de mensagem a ser enviada/recebida
+	short tipo = 0;
+	//numero de sequencia da mensagem a ser enviada
+	short sequencia = 0;
+	//numero de sequencia da mensagem recebida
+	short seqRec = 0;
+	//tamanho de DADOS da mensagem recebida
+	short tamRec = 0;
+	//mensagem recebida por completo
+	unsigned char msgRec[MSG_SIZE];
+	//bits de DADOS da msg recebida
+	unsigned char *dataRec;
 
 	while(true){
 		//recebe mensagem
-		unsigned char dataRec[MSG_SIZE];
-		int r = read(soquete, dataRec, MSG_SIZE);
-		printf("%d\n", r);
-		printf("%s\n", dataRec);
-		//TODO desempacota mensagem
-			//confere se mensagem tem inicio 01111110
-			//confere o tamanho da mensagem
-			//confere qual a sequencia da mensagem
-			//confere o tipo da mensagem
-			//extrai dados de acordo com tamanho da mensagem
-			//atraves da paridade, confere se mensagem eh correta(usar paridade vertical de 8bits)
-				//se paridade incorreta responder com nack
-		//TODO define qual o tipo de mensagem e opera ela
-		//ver detalhes no README
-		//TODO cria resposta adequada para cada tipo de mensagem
-			//cd
-			//ls
-			//get
-			//put
-		//TODO empacota resposta e envia
+		int r = read(soquete, msgRec, MSG_SIZE);
+		//desempacota mensagem
+		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
+		//-2 paridade não confere.
+		//confere se paridade incorreta responder com NACK
+		if(){
+
+		}
+		//confere o tamanho da mensagem
+		//confere qual a sequencia da mensagem
+		if(status == 0){
+			//TODO cria resposta adequada para cada tipo de mensagem
+			printf("%d\n", r);
+			printf("%s\n", dataRec);
+			switch(tipo){
+				case 0: //ACK
+					break;
+				case 2: //tamanho de arquivo
+					break;
+				case 3: //ok
+					break;
+				case 6: //cd
+					break;
+				case 7: //ls
+					break;
+				case 8: //get
+					break;
+				case 9: //put
+					break;
+				case 10: //fim
+					break;
+				case 12: //mostra na tela
+					break;
+				case 13: //dados
+					break;
+				case 14: //erro
+					break;
+				case 15: //NACK
+					break;
+				default:
+					printf("ERRO: o tipo da mensagem não confere com nada");
+			}
+		}	
 	}	
 }
 

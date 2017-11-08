@@ -93,13 +93,43 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
         return 0;
 }
 
-int desempacotaMsg(char *msgRecebida){
-	//TODO Verificar inicio
-	//TODO retirar informacao do tamanho
-	//TODO verificar se paridade bate
+//retorna 0 para nenhum erro
+//-1 para erro de inicio
+//-2 para erro de paridade
+int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *tam, short *tipo){
+	//Verificar inicio
+	if(msg[0] != 0x7E){
+		printf("ERRO: O inicio da mensagem %s não confere\n", msg);
+		return -1;
+	}
 
-	//TODO retornar dados extraidos
-	//TODO retornar tipo da mensagem
-	//TODO retornar o numero de sequencia
+	controle ctrl;
+	char *aux = (char*) (&ctrl);
+	aux[0] = msg[1];
+	aux[1] = msg[2];
+	//retirar informacao do tamanho
+	tam = ctrl.tam;
+	//retornar o numero de sequencia
+	seq = ctrl.seq;
+	//retornar tipo da mensagem
+	tipo = ctrl.tipo;
+	//retornar dados extraidos
+	for(int i = 3; i < tam+3; i++){
+		data[i-3] = msg[i];
+	}
+	//verificar se paridade bate
+	char paridade = msg[tam+3];
+	char atual;
+	char anterior;	
+	anterior = msg[3];
+	for(int i = 4; i < tam + 3; i++){
+		atual = msg[i];			
+		//Irei fazer um AND dos chars
+		anterior = atual && anterior;
+	}
+	if(paridade != anterior){
+		printf("ERRO: A paridade não confere\n");
+		return -2;
+	}
 	return 0;
 }
