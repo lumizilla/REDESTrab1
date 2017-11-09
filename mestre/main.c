@@ -81,21 +81,31 @@ int main(){
 				fflush(stdout);
 				write(soquete, msgResto, (tamMsg+OVERLOAD_SIZE));	
 				sequencia = aumentaSeq(sequencia);
-
+				
+				switch(tipo){
 				//TODO esperar resposta de acordo com o comando previamente enviado
-			//ls
-				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
-			//cd
-				//basicamente nao faz nada
-			//put
-				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
-			//get
-				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
-			//ERRO
-				//TODO printar erro
-
+					//ls
+					case 7:
+					//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
+						break;
+					//cd
+					case 6:
+					//basicamente nao faz nada
+						break;
+					case 9:
+					//put
+					//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
+						break;
+					case 8:
+					//get
+					//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
+						break;
+					default:
+						printf("ERRO: Tipo de mensagem nao esperado");
+						break;
+				}
 			}
-			else{
+			else {
 				printf("ERRO: O comando eh muito grande e nao cabe em uma mensagem.\n");
 			}
 		}
