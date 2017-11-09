@@ -44,15 +44,6 @@ int main(){
 			printf("%d\n", r);
 			printf("%s\n", dataRec);
 			switch(tipo){
-				case 0: //ACK
-					//TODO: Tira a mensagem da lista de mensagens sem ACK
-					break;
-				case 2: //tamanho de arquivo	
-					//TODO Salva a informação de tamanho de arquivo e responde com ACK
-					break;
-				case 3: //ok
-					//TODO Termina o PUT, responde com ACK
-					break;
 				case 6: //cd
 					//TODO Realiza a troca de diretório e responde com ACK
 					break;
@@ -65,23 +56,8 @@ int main(){
 				case 9: //put
 					//TODO Responde com ACK/ERRO, se foi um ACK, recebe as mensagens ate o "fim"
 					break;
-				case 10: //fim
-					//TODO termina de receber as mensagens e responde com ACK
-					break;
-				case 12: //mostra na tela
-					//TODO Isso nao acontece no escravo, soh no mestre. Por isso responde com NACK
-					break;
-				case 13: //dados
-					//TODO Recebe os dados e responde com ACK's
-					break;
-				case 14: //erro
-					//TODO Reenvia a mensagem referente ao erro
-					break;
-				case 15: //NACK
-					//TODO Reenvia a mensagem referente ao NACK
-					break;
 				default:
-					printf("ERRO: o tipo da mensagem não confere com nada");
+					printf("ERRO: o tipo da mensagem não confere\n");
 			}
 		}	
 	}	
