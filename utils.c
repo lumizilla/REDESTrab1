@@ -86,6 +86,7 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	for(int i = 2; i < tam + 3; i++){
 		atual = msgEnviar[i];			
 		//Irei fazer um AND dos chars
+		printf("ant: %d , atual: %d \n", anterior, atual);
 		anterior = atual & anterior;
 	}
 	paridade = anterior;
@@ -127,9 +128,8 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	for(int i = 2; i < *tam + 3; i++){
 		atual = msg[i];			
 		//Irei fazer um AND dos chars
-		printf("ant: %d , atual: %d -", anterior, atual);
-		auxx = atual & anterior;
-		anterior = auxx;
+		printf("ant: %d , atual: %d \n", anterior, atual);
+		anterior = atual & anterior;
 	}
 	printf("\npar %d, ant %d\n", paridade, anterior);
 	if(paridade != anterior){
