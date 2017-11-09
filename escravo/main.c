@@ -14,7 +14,7 @@ int main(){
 	//mensagem recebida por completo
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
-	unsigned char *dataRec;
+	unsigned char dataRec[DATA_SIZE];
 
 	while(true){
 		//recebe mensagem

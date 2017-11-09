@@ -86,7 +86,7 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	for(int i = 2; i < tam + 3; i++){
 		atual = msgEnviar[i];			
 		//Irei fazer um AND dos chars
-		anterior = atual && anterior;
+		anterior = atual & anterior;
 	}
 	paridade = anterior;
 	msgEnviar[tam+3] = paridade;
@@ -99,34 +99,39 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *tam, short *tipo){
 	//Verificar inicio
 	if(msg[0] != 0x7E){
-		printf("ERRO: O inicio da mensagem %s não confere\n", msg);
+		//printf("ERRO: O inicio da mensagem %s não confere\n", msg);
 		return -1;
 	}
-
 	controle ctrl;
 	char *aux = (char*) (&ctrl);
 	aux[0] = msg[1];
 	aux[1] = msg[2];
 	//retirar informacao do tamanho
-	tam = ctrl.tam;
+	*tam = ctrl.tam;
 	//retornar o numero de sequencia
-	seq = ctrl.seq;
+	*seq = ctrl.seq;
 	//retornar tipo da mensagem
-	tipo = ctrl.tipo;
+	*tipo = ctrl.tipo;
 	//retornar dados extraidos
+	printf("aqui2, tam = %d, tam msg=%d, msg=%s, tam data=%d\n", *tam, (int)strlen(msg), msg, (int)strlen(data));
+	fflush(stdout);
 	for(int i = 3; i < *tam+3; i++){
 		data[i-3] = msg[i];
 	}
 	//verificar se paridade bate
 	char paridade = msg[*tam+3];
 	char atual;
-	char anterior;	
-	anterior = msg[3];
-	for(int i = 4; i < *tam + 3; i++){
+	char anterior;
+	char auxx;	
+	anterior = msg[1];
+	for(int i = 2; i < *tam + 3; i++){
 		atual = msg[i];			
 		//Irei fazer um AND dos chars
-		anterior = atual && anterior;
+		printf("ant: %d , atual: %d -", anterior, atual);
+		auxx = atual & anterior;
+		anterior = auxx;
 	}
+	printf("\npar %d, ant %d\n", paridade, anterior);
 	if(paridade != anterior){
 		printf("ERRO: A paridade não confere\n");
 		return -2;
