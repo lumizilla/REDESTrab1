@@ -114,15 +114,15 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	//retornar tipo da mensagem
 	tipo = ctrl.tipo;
 	//retornar dados extraidos
-	for(int i = 3; i < tam+3; i++){
+	for(int i = 3; i < *tam+3; i++){
 		data[i-3] = msg[i];
 	}
 	//verificar se paridade bate
-	char paridade = msg[tam+3];
+	char paridade = msg[*tam+3];
 	char atual;
 	char anterior;	
 	anterior = msg[3];
-	for(int i = 4; i < tam + 3; i++){
+	for(int i = 4; i < *tam + 3; i++){
 		atual = msg[i];			
 		//Irei fazer um AND dos chars
 		anterior = atual && anterior;
