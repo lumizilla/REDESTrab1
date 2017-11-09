@@ -26,10 +26,19 @@ int main(){
 	short tam = 0;
 	//tamanho da mensagem inteira
 	short tamMsg = 0;
-
+	printf("--------------------x--------------------\n");
+	printf("Minishell - Como usar\n");
+	printf("lls 'opcoes': ls local\n");
+	printf("lcd 'caminho': cd local\n");
+	printf("rls 'opcoes': ls remoto\n");
+	printf("rcd 'caminho': cd remoto\n");
+	printf("get 'arquivo': pega arquivo do dir corrente do escravo e coloca no dir corrente do mestre\n");
+	printf("put 'arquivo': pega arquivo do dir corrente do mestre e coloca no dir corrente do escravo\n");
+	printf("--------------------x--------------------\n\n");
+	
 	while(true){
 		//lendo o comando
-		printf("Qual o seu comando?\n");
+		printf(">> ");
 		fgets(comando_usuario, MAX_INPUT, stdin);
 		//salvando comando_usuario em outra variavel
 		strcpy(comando_salvo, comando_usuario);
@@ -50,15 +59,21 @@ int main(){
 			i = i+1;
 		}
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
-		if(strcmp(subs[0],"cd") != 0 && strcmp(subs[0],"ls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
+		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0],"lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
+		}
+		else if(strcmp(subs[0],"lcd") == 0){
+		//TODO	
+		}
+		else if(strcmp(subs[0],"lls") == 0){
+		//TODO	
 		}
 		else{	
 			//empacotar mensagem no formato correto
-			if(strcmp(subs[0], "cd") == 0){
+			if(strcmp(subs[0], "rcd") == 0){
 				tipo = 6; 
 			}
-			else if(strcmp(subs[0], "ls") == 0){
+			else if(strcmp(subs[0], "rls") == 0){
 				tipo = 7;
 			}
 			else if(strcmp(subs[0], "get") == 0){
