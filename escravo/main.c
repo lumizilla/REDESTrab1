@@ -29,7 +29,8 @@ int main(){
 			//empacota NACK, NO CAMPO DE DADOS O NUMERO DE SEQ DA MENSAGEM
 			unsigned char msgEnviar[MSG_SIZE];
 			unsigned char msg[DATA_SIZE];
-			itoa(seqRec, msg, 10);
+			//itoa(seqRec, msg, 10);
+			snprintf(msg, sizeof(msg), "%d", seqRec);			
 			empacotaMsg(msg, msgEnviar, 15, sequencia, DATA_SIZE);
 			printf("%s\n", msgEnviar);
 			fflush(stdout);
