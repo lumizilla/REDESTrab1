@@ -26,14 +26,17 @@ int main(){
 	short tam = 0;
 	//tamanho da mensagem inteira
 	short tamMsg = 0;
+	//apenas para guardar comandos locais
+	char localCommand[DATA_SIZE];
+
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
 	printf("lls 'opcoes': ls local\n");
 	printf("lcd 'caminho': cd local\n");
 	printf("rls 'opcoes': ls remoto\n");
 	printf("rcd 'caminho': cd remoto\n");
-	printf("get 'arquivo': pega arquivo do dir corrente do escravo e coloca no dir corrente do mestre\n");
-	printf("put 'arquivo': pega arquivo do dir corrente do mestre e coloca no dir corrente do escravo\n");
+	printf("get 'arquivo': pega arquivo do dir corrente\n\t do escravo e coloca no dir corrente do mestre\n");
+	printf("put 'arquivo': pega arquivo do dir corrente\n\t do mestre e coloca no dir corrente do escravo\n");
 	printf("--------------------x--------------------\n\n");
 	
 	while(true){
@@ -63,10 +66,22 @@ int main(){
 			printf("ERRO: comando invalido\n");
 		}
 		else if(strcmp(subs[0],"lcd") == 0){
-		//TODO	
+			//TODO CD NAO ESTA FUNCIONANDO
+			strcpy(localCommand, "cd ");
+			if(subs[1] != NULL){
+				strcat(localCommand, subs[1]);
+			}
+			strcat(localCommand, "\n");
+			printf("o comando local foi %s\n", localCommand);			
+			system(localCommand);
 		}
 		else if(strcmp(subs[0],"lls") == 0){
-		//TODO	
+			strcpy(localCommand, "ls ");
+			if(subs[1] != NULL){
+				strcat(localCommand, subs[1]);
+			}			
+			strcat(localCommand, "\n");
+			system(localCommand);
 		}
 		else{	
 			//empacotar mensagem no formato correto
