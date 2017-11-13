@@ -28,6 +28,8 @@ int main(){
 	short tamMsg = 0;
 	//apenas para guardar comandos locais
 	char localCommand[DATA_SIZE];
+	//guarda o PATH do diretorio corrente
+	char path[MAX_INPUT] = "";
 
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
@@ -53,21 +55,20 @@ int main(){
 		subs[2] = "";
 
 		/*getting the first substring*/
-		input = strtok(comando_usuario, " ");
+		input = strtok(comando_usuario, " \n");
 		/*walking trough the other substrings*/
 		int i = 0;		
 		while(input != NULL){
 			subs[i] = input;
-			input = strtok(NULL, " ");
+			input = strtok(NULL, " \n");
 			i = i+1;
 		}
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
-		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0],"lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
+		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
 		else if(strcmp(subs[0],"lcd") == 0){
-			//TODO CD NAO ESTA FUNCIONANDO
-			strcpy(localCommand, "cd ");
+			strcpy(localCommand, "");
 			if(subs[1] != NULL){
 				strcat(localCommand, subs[1]);
 			}
@@ -75,12 +76,17 @@ int main(){
 			printf("o comando local foi %s\n", localCommand);	
 			//TODO testar
 			chdir(localCommand);
+			//TODO testar se houve erro neste comando e printar o erro
+			//TODO testar se o path novo é muito grande
+			//se nao houve erro, guardar o diretorio corrente
+			strcpy(path, localCommand);
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
 			if(subs[1] != NULL){
 				strcat(localCommand, subs[1]);
-			}			
+			}
+			strcat(localCommand, path);			
 			strcat(localCommand, "\n");
 			system(localCommand);
 		}
