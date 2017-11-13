@@ -72,8 +72,9 @@ int main(){
 				strcat(localCommand, subs[1]);
 			}
 			strcat(localCommand, "\n");
-			printf("o comando local foi %s\n", localCommand);			
-			system(localCommand);
+			printf("o comando local foi %s\n", localCommand);	
+			//TODO testar
+			chdir(localCommand);
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
