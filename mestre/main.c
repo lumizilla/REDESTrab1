@@ -57,17 +57,23 @@ int main(){
 		/*getting the first substring*/
 		input = strtok(comando_usuario, " \n");
 		/*walking trough the other substrings*/
-		int i = 0;		
+		int i = 0;	
 		while(input != NULL){
 			subs[i] = input;
 			input = strtok(NULL, " \n");
 			i = i+1;
 		}
+		
+		//subsc guarda a quantidade de argumentos em subs
+		int subsc = i;
+		
 		//se o comando nao atender aos padroes, nao enviar e avisar o usuario qual o padrao
 		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
 		else if(strcmp(subs[0],"lcd") == 0){
+			//TODO testar se o path novo eh muito grande e se tem "..", se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
+			//se nao houve erro, guardar o diretorio corrente
 			strcpy(localCommand, path);
 			strcat(localCommand, "/");
 			if(subs[1] != NULL){
@@ -77,17 +83,22 @@ int main(){
 			strcat(localCommand, "\n");
 			printf("o comando local foi %s\n", localCommand);	
 			mudaDir(localCommand);
-			//TODO testar se houve erro neste comando e printar o erro
-			//TODO testar se o path novo eh muito grande e se tem "..", se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
-			//se nao houve erro, guardar o diretorio corrente
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
-			if(subs[1] != NULL){
-				strcat(localCommand, subs[1]);
+			//TODO ls pode ter opcoes, por isso analisar o subs ate o final
+			for(int i = 1; i < subsc-1; i++){
+				strcat(localCommand, subs[i]);
+				strcat(localCommand, " ");
 			}
-			strcat(localCommand, path);			
+			//se tiver opcoes, o ultimo subs deve ser o path
+			strcat(localCommand, path);
+			strcat(localCommand, "/");
+			if(subs[subsc] != NULL){
+				strcat(localCommand, subs[subsc]);
+			}
 			strcat(localCommand, "\n");
+			//TODO testar se deu erro, printar erro
 			system(localCommand);
 		}
 		else{	
