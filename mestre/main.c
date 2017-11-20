@@ -3,7 +3,8 @@
 
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");        
-	int soquete = ConexaoRawSocket("eno1");
+	//int soquete = ConexaoRawSocket("eno1");
+	int soquete = ConexaoRawSocket("enp3s0");
 	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
 	//mensagem ja empacotada de tamanho maximo, pronta a ser enviada

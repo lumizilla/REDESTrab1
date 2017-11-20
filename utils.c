@@ -99,10 +99,10 @@ int mudaDir(char *caminho){
 				fprintf(stderr, "ERRO: %s nao eh um diretorio.\n", caminho);
   				break;
 			case ENOENT:
-				fprintf(stderr, "%s nao existe.\n", dir);
+				fprintf(stderr, "ERRO: %s nao existe.\n", caminho);
 				break;
 			default:
-				fprintf("ERRO: Algum erro ocorreu com o cd %s\n", caminho);
+				fprintf(stderr, "ERRO: Algum erro ocorreu com o cd %s\n", caminho);
 				break;
 		}
 		return errno;
