@@ -76,13 +76,21 @@ int main(){
 		else if(strcmp(subs[0],"lcd") == 0){		
 			strcpy(localCommand, path);
 			strcat(localCommand, "/");
-			char *caminho = "";
+			char caminho[MAX_INPUT];
+			fflush(stdout);
+			printf("aqui\n");
 			if(subs[1] != NULL){
+				printf("aaaaaqui\n");
+				fflush(stdout);
 				//TODO testar se o path novo eh muito grande e se tem "..", 
 				//se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
 				strcpy(caminho, localCommand);
 				strcat(caminho, subs[1]);
-				caminho = apagaRelativos(caminho);
+				printf("%s\n", caminho);
+				fflush(stdout);
+				char *caminhonovo = apagaRelativos(caminho);
+				printf("caminho %s\n", caminho);
+				fflush(stdout);
 				strcat(localCommand, caminho);
 			}
 			strcat(localCommand, "\n");
