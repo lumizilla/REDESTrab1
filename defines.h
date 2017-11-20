@@ -30,6 +30,13 @@
 
 //tamanho maximo do comando de input do mestre
 #define MAX_INPUT 200
+
+//tamanho maximo do path em termos do numero de diretorios andados
+#define MAX_PATH 30
+
+//tamanho maximo do nome de um diretorio com a /
+#define MAX_DIR 31
+
 typedef struct cont {
 	unsigned short tam : 5,
 		seq : 6,

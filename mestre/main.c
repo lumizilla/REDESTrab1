@@ -3,8 +3,8 @@
 
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");        
-	//int soquete = ConexaoRawSocket("eno1");
-	int soquete = ConexaoRawSocket("enp3s0");
+	int soquete = ConexaoRawSocket("eno1");
+	//int soquete = ConexaoRawSocket("enp3s0");
 	//comando(ou pedaco de comando) a ser enviado, empacotado
 	unsigned char comando[DATA_SIZE];
 	//mensagem ja empacotada de tamanho maximo, pronta a ser enviada
@@ -31,7 +31,7 @@ int main(){
 	//apenas para guardar comandos locais
 	char localCommand[DATA_SIZE];
 	//guarda o PATH do diretorio corrente
-	char path[MAX_INPUT] = ".";
+	char path[MAX_INPUT] = "./";
 
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
@@ -74,31 +74,25 @@ int main(){
 			printf("ERRO: comando invalido\n");
 		}
 		else if(strcmp(subs[0],"lcd") == 0){		
-			strcpy(localCommand, path);
-			strcat(localCommand, "/");
 			char caminho[MAX_INPUT];
-			fflush(stdout);
-			printf("aqui\n");
 			if(subs[1] != NULL){
-				printf("aaaaaqui\n");
-				fflush(stdout);
-				//TODO testar se o path novo eh muito grande e se tem "..", 
-				//se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
-				strcpy(caminho, localCommand);
+				//testar se o path novo eh muito grande e se tem "..", 
+				//se sim apaga o que vem antes dos .. a nao ser que seja o './' inicial
+				strcpy(caminho, path);
 				strcat(caminho, subs[1]);
-				printf("%s\n", caminho);
-				fflush(stdout);
-				char *caminhonovo = apagaRelativos(caminho);
-				printf("caminho %s\n", caminho);
-				fflush(stdout);
+				apagaRelativos(caminho);
 				strcat(localCommand, caminho);
 			}
-			strcat(localCommand, "\n");
+			else{
+				strcpy(localCommand, path);
+			}
 			printf("o comando local foi cd %s\n", localCommand);	
-			if(mudaDir(localCommand) == 0 && caminho != ""){
+			//strcat(localCommand, "\n");
+			if(mudaDir(localCommand) == 0 && (caminho != "")){
 				//se nao houve erro, guardar no diretorio corrente
 				strcpy(path, caminho);
 			}
+			strcpy(localCommand, "");
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
@@ -118,6 +112,7 @@ int main(){
 			if(system(localCommand) == -1){
 				printf("ERRO: erro ao executar o comando %s\n", localCommand);	
 			}
+			strcpy(localCommand, "");
 		}
 		else{	
 			//empacotar mensagem no formato correto

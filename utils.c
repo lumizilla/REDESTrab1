@@ -45,42 +45,54 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
-char *apagaRelativos(char *caminho){
-	//TODO TESTAR se funfa
-	char **subs;
+void apagaRelativos(char *caminho){
+	char *subs[MAX_PATH];
 	/*getting the first substring*/
-	char *input = strtok(caminho, "/");
+	char *input = strtok(caminho, "/");	
 	/*walking trough the other substrings*/
 	int i = 0;	
 	while(input != NULL){
 		subs[i] = input;
+		printf("%s\n", subs[i]);
 		input = strtok(NULL, "/");
 		i = i+1;
 	}
+
 	//se o primeiro elemento eh um ..
-	if(subs[1] == ".."){
+	if(strcmp(subs[1], "..") == 0){
+		subs[1]	= "";
+	}
+	if(strcmp(subs[1], ".") == 0){
 		subs[1]	= "";
 	}
 	for(int j = 2; j < i; j++){
 		//se o subs atual eh um .., apagar o path anterior a este que nao eh vazio
-		if(subs[j] == ".."){
+		if(strcmp(subs[j], "..") == 0){
 			subs[j] = "";
 			for(int k = j-1; k > 0; k --){
-				if(subs[k] != ""){
+				if(strcmp(subs[k], "") != 0){
 					subs[k] = "";
+					break;
 				}
 			}
 		}
-	}
-	//colocando tudo o que nao eh vazio de volta novamente em uma string
-	caminho = "";
-	for(int j = 0; j < i; j++){
-		if(subs[j] != ""){
-			strcat(caminho, subs[j]);
-			strcat(caminho, "/");
+		else if(strcmp(subs[j], ".") == 0){
+			subs[1]	= "";
 		}
 	}
-	return caminho;
+	//colocando tudo o que nao eh vazio de volta novamente em uma string
+	char retorno[MAX_DIR*MAX_PATH];
+	strcpy(retorno, "");
+	for(int j = 0; j < i; j++){
+		printf("%s - ", subs[j]);
+		if(strcmp(subs[j], "") != 0){
+			strcat(retorno, subs[j]);
+			strcat(retorno, "/");
+		}
+	}
+	
+	strcpy(caminho, retorno);
+	return;
 }
 
 int mudaDir(char *caminho){
