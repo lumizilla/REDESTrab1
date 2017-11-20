@@ -60,6 +60,9 @@ int mudaDir(char *caminho){
 			case ENOTDIR:
 				fprintf(stderr, "ERRO: %s nao eh um diretorio.\n", caminho);
   				break;
+			case ENOENT:
+				fprintf(stderr, "%s nao existe.\n", dir);
+				break;
 			default:
 				fprintf("ERRO: Algum erro ocorreu com o cd %s\n", caminho);
 				break;
