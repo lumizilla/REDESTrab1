@@ -58,7 +58,7 @@ char *apagaRelativos(char *caminho){
 		i = i+1;
 	}
 	//se o primeiro elemento eh um ..
-	if(subs[1] == ".." && subs[1] != NULL){
+	if(subs[1] == ".."){
 		subs[1]	= "";
 	}
 	for(int j = 2; j < i; j++){
