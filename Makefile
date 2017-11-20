@@ -1,6 +1,6 @@
 all: 
-	echo "Compilando mestre..."; cd mestre; gcc  main.c -o mestre -lm; cd ..; \
-        echo "Compilando escravo..."; cd escravo; gcc  main.c -o escravo -lm; cd ..	
+	echo "Compilando mestre..."; cd mestre; gcc -std=gnu99  main.c -o mestre -lm; cd ..; \
+        echo "Compilando escravo..."; cd escravo; gcc -std=gnu99 main.c -o escravo -lm; cd ..	
 
 clean:
 	echo "Removendo arquivos inuteis..."; \
