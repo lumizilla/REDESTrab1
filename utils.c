@@ -45,6 +45,44 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
+char *apagaRelativos(char *caminho){
+	//TODO TESTAR se funfa
+	char **subs;
+	/*getting the first substring*/
+	char *input = strtok(caminho, "/");
+	/*walking trough the other substrings*/
+	int i = 0;	
+	while(input != NULL){
+		subs[i] = input;
+		input = strtok(NULL, "/");
+		i = i+1;
+	}
+	//se o primeiro elemento eh um ..
+	if(subs[1] == ".." && subs[1] != NULL){
+		subs[1]	= "";
+	}
+	for(int j = 2; j < i; j++){
+		//se o subs atual eh um .., apagar o path anterior a este que nao eh vazio
+		if(subs[j] == ".."){
+			subs[j] = "";
+			for(int k = j-1; k > 0; k --){
+				if(subs[k] != ""){
+					subs[k] = "";
+				}
+			}
+		}
+	}
+	//colocando tudo o que nao eh vazio de volta novamente em uma string
+	caminho = "";
+	for(int j = 0; j < i; j++){
+		if(subs[j] != ""){
+			strcat(caminho, subs[j]);
+			strcat(caminho, "/");
+		}
+	}
+	return caminho;
+}
+
 int mudaDir(char *caminho){
 	if(chdir(caminho) < 0){
 		switch(errno){
