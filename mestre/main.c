@@ -102,8 +102,10 @@ int main(){
 				strcat(localCommand, subs[subsc]);
 			}
 			strcat(localCommand, "\n");
-			//TODO testar se deu erro, printar erro
-			system(localCommand);
+			//testa se deu erro, printar erro
+			if(system(localCommand) == -1){
+				printf("ERRO: erro ao executar o comando %s\n", localCommand);	
+			}
 		}
 		else{	
 			//empacotar mensagem no formato correto
