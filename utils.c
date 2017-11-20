@@ -44,6 +44,33 @@ int ConexaoRawSocket(char *device)
 
   return soquete;
 }
+
+int mudaDir(char *caminho){
+	if(chdir(caminho) < 0){
+		switch(errno){
+			case EACCES:
+				fprintf(stderr, "ERRO: Permissao negada.\n");
+				break;
+			case ELOOP:
+				fprintf(stderr, "ERRO: Loop no link simbolico.\n");
+				break;
+			case ENAMETOOLONG:
+				fprintf(stderr, "ERRO: %s eh muito grande.\n", caminho);
+				break;
+			case ENOTDIR:
+				fprintf(stderr, "ERRO: %s nao eh um diretorio.\n", caminho);
+  				break;
+			default:
+				fprintf("ERRO: Algum erro ocorreu com o cd %s\n", caminho);
+				break;
+		}
+		return errno;
+	}
+	else{
+		return 0;	
+	}	
+}
+
 int aumentaSeq (int seq){
 	if(seq == SEQ_MAX){
 		return 0;
