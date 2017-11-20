@@ -71,18 +71,22 @@ int main(){
 		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
-		else if(strcmp(subs[0],"lcd") == 0){
-			//TODO testar se o path novo eh muito grande e se tem "..", se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
-			//se nao houve erro, guardar o diretorio corrente
+		else if(strcmp(subs[0],"lcd") == 0){		
 			strcpy(localCommand, path);
 			strcat(localCommand, "/");
 			if(subs[1] != NULL){
-				strcat(localCommand, subs[1]);
+				//TODO testar se o path novo eh muito grande e se tem "..", 
+				//se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
+				char *caminho = apagaRelativos(subs[1]);
+				strcat(localCommand, caminho);
 			}
-			strcpy(path, localCommand);
 			strcat(localCommand, "\n");
 			printf("o comando local foi %s\n", localCommand);	
-			mudaDir(localCommand);
+			if(mudaDir(localCommand) == 0){
+				//se nao houve erro, guardar no diretorio corrente
+				strcat(path, "/");
+				strcat(path, caminho);
+			}
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
