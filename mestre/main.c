@@ -76,7 +76,7 @@ int main(){
 			strcpy(path, localCommand);
 			strcat(localCommand, "\n");
 			printf("o comando local foi %s\n", localCommand);	
-			chdir(localCommand);
+			mudaDir(localCommand);
 			//TODO testar se houve erro neste comando e printar o erro
 			//TODO testar se o path novo eh muito grande e se tem "..", se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
 			//se nao houve erro, guardar o diretorio corrente
