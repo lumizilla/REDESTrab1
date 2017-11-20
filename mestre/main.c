@@ -14,6 +14,7 @@ int main(){
 	char comando_salvo[MAX_INPUT];
 	//para guardar o input do usuario
 	char *input;
+	//TODO alterar para subs ter tamanho qualquer
 	char *subs[3];
 
 	//tipo de mensagem a ser enviada
