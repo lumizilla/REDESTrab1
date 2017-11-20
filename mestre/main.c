@@ -75,37 +75,26 @@ int main(){
 		}
 		else if(strcmp(subs[0],"lcd") == 0){		
 			char caminho[MAX_INPUT];
+			strcpy(caminho, "");
 			if(subs[1] != NULL){
 				//testar se o path novo eh muito grande e se tem "..", 
 				//se sim apaga o que vem antes dos .. a nao ser que seja o './' inicial
-				strcpy(caminho, path);
 				strcat(caminho, subs[1]);
+			}
+			printf("o comando local foi cd %s\n", caminho);	
+			if(mudaDir(caminho) == 0 && (caminho != "")){
 				apagaRelativos(caminho);
-				strcat(localCommand, caminho);
-			}
-			else{
-				strcpy(localCommand, path);
-			}
-			printf("o comando local foi cd %s\n", localCommand);	
-			//strcat(localCommand, "\n");
-			if(mudaDir(localCommand) == 0 && (caminho != "")){
 				//se nao houve erro, guardar no diretorio corrente
 				strcpy(path, caminho);
 			}
-			strcpy(localCommand, "");
+
 		}
 		else if(strcmp(subs[0],"lls") == 0){
-			strcpy(localCommand, "ls ");
+			strcpy(localCommand, "ls");
 			//ls pode ter opcoes, por isso analisar o subs ate o final
-			for(int i = 1; i < subsc-1; i++){
-				strcat(localCommand, subs[i]);
+			for(int i = 1; i < subsc; i++){	
 				strcat(localCommand, " ");
-			}
-			//se tiver opcoes, o ultimo subs deve ser o path
-			strcat(localCommand, path);
-			strcat(localCommand, "/");
-			if(subs[subsc] != NULL){
-				strcat(localCommand, subs[subsc]);
+				strcat(localCommand, subs[i]);
 			}
 			strcat(localCommand, "\n");
 			//testa se deu erro, printar erro

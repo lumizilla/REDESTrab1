@@ -53,7 +53,6 @@ void apagaRelativos(char *caminho){
 	int i = 0;	
 	while(input != NULL){
 		subs[i] = input;
-		printf("%s\n", subs[i]);
 		input = strtok(NULL, "/");
 		i = i+1;
 	}
@@ -84,7 +83,6 @@ void apagaRelativos(char *caminho){
 	char retorno[MAX_DIR*MAX_PATH];
 	strcpy(retorno, "");
 	for(int j = 0; j < i; j++){
-		printf("%s - ", subs[j]);
 		if(strcmp(subs[j], "") != 0){
 			strcat(retorno, subs[j]);
 			strcat(retorno, "/");
