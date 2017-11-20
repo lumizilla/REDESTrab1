@@ -74,18 +74,20 @@ int main(){
 		else if(strcmp(subs[0],"lcd") == 0){		
 			strcpy(localCommand, path);
 			strcat(localCommand, "/");
+			char *caminho = "";
 			if(subs[1] != NULL){
 				//TODO testar se o path novo eh muito grande e se tem "..", 
 				//se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
-				char *caminho = apagaRelativos(subs[1]);
+				strcpy(caminho, localCommand);
+				strcat(caminho, subs[1]);
+				caminho = apagaRelativos(caminho);
 				strcat(localCommand, caminho);
 			}
 			strcat(localCommand, "\n");
 			printf("o comando local foi cd %s\n", localCommand);	
-			if(mudaDir(localCommand) == 0){
+			if(mudaDir(localCommand) == 0 && caminho != ""){
 				//se nao houve erro, guardar no diretorio corrente
-				strcat(path, "/");
-				strcat(path, caminho);
+				strcpy(path, caminho);
 			}
 		}
 		else if(strcmp(subs[0],"lls") == 0){
