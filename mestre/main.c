@@ -43,7 +43,7 @@ int main(){
 	
 	while(true){
 		//lendo o comando
-		printf(">> ");
+		printf("%s >> ", path);
 		fgets(comando_usuario, MAX_INPUT, stdin);
 		//salvando comando_usuario em outra variavel
 		strcpy(comando_salvo, comando_usuario);
@@ -81,7 +81,7 @@ int main(){
 				strcat(localCommand, caminho);
 			}
 			strcat(localCommand, "\n");
-			printf("o comando local foi %s\n", localCommand);	
+			printf("o comando local foi cd %s\n", localCommand);	
 			if(mudaDir(localCommand) == 0){
 				//se nao houve erro, guardar no diretorio corrente
 				strcat(path, "/");
@@ -90,7 +90,7 @@ int main(){
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
-			//TODO ls pode ter opcoes, por isso analisar o subs ate o final
+			//ls pode ter opcoes, por isso analisar o subs ate o final
 			for(int i = 1; i < subsc-1; i++){
 				strcat(localCommand, subs[i]);
 				strcat(localCommand, " ");
