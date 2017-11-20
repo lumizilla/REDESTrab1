@@ -21,7 +21,7 @@ https://gitlab.c3sl.ufpr.br/mro15/ftp-simplificado
 
 ## Fazer isso aqui depois de bootar:
 ```
-sudo apt-get update; sudo apt-get install git -y; sudo apt-get install build-essential -y; sudo apt-get install gedit -y; sudo apt-get install tree -y; git clone https://github.com/lumizila/REDESTrab1.git; git config --global user.email "lumiwille@gmail.com"; git config --global user.name "Luiza"; cd REDESTrab1;
+sudo apt-get install git -y; sudo apt-get install build-essential -y; sudo apt-get install gedit -y; sudo apt-get install tree -y; git clone https://github.com/lumizila/REDESTrab1.git; git config --global user.email "lumiwille@gmail.com"; git config --global user.name "Luiza"; cd REDESTrab1;
 ```
 ## RODAR AS COISAS COM SUDO
 
