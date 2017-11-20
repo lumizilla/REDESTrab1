@@ -29,7 +29,7 @@ int main(){
 	//apenas para guardar comandos locais
 	char localCommand[DATA_SIZE];
 	//guarda o PATH do diretorio corrente
-	char path[MAX_INPUT] = "";
+	char path[MAX_INPUT] = ".";
 
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
@@ -68,18 +68,18 @@ int main(){
 			printf("ERRO: comando invalido\n");
 		}
 		else if(strcmp(subs[0],"lcd") == 0){
-			strcpy(localCommand, "");
+			strcpy(localCommand, path);
+			strcat(localCommand, "/");
 			if(subs[1] != NULL){
 				strcat(localCommand, subs[1]);
 			}
+			strcpy(path, localCommand);
 			strcat(localCommand, "\n");
 			printf("o comando local foi %s\n", localCommand);	
-			//TODO testar
 			chdir(localCommand);
 			//TODO testar se houve erro neste comando e printar o erro
-			//TODO testar se o path novo é muito grande
+			//TODO testar se o path novo eh muito grande e se tem "..", se sim apagar o que vem antes dos .. a nao ser que seja o './' inicial
 			//se nao houve erro, guardar o diretorio corrente
-			strcpy(path, localCommand);
 		}
 		else if(strcmp(subs[0],"lls") == 0){
 			strcpy(localCommand, "ls ");
