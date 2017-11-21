@@ -92,6 +92,7 @@ O LLC(logical link control) é composto por: \
 -Sequencializacao (campo sequencia) \
 -Controle de fluxo (Apenas para dados, usa janela deslizante de tamanho 3 e repeticao seletiva) \
 -Deteccao de erros (Usa paridade vertical de 8 bits) 
+![janela](imagens/janela.jpg?raw=true "Optional Title")
 
 Protocolo: deve seguir o protocolo baseado no Kermit
 
