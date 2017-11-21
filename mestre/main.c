@@ -140,11 +140,29 @@ int main(){
 						break;
 					//cd
 					case 6:
-					//basicamente nao faz nada
+						//TODO Janela deslizante ?
+						//TODO aguarda OK
+						//TODO se NACK, reenvia msg
+						//TODO se ERRO, printa erro
 						break;
-					case 9:
 					//put
-					//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
+					case 9:
+						//TODO Janela deslizante ?
+						//TODO aguarda OK{
+							//TODO envia tamanho
+							//TODO aguarda OK{
+								//TODO envia os dados
+									//TODO aguarda ACK dos dados
+									//TODO se nack de algum dado, reenviar
+								//TODO envia fim{
+									//TODO aguarda OK
+									//TODO se NACK, reenvia msg
+							//	}	
+							//}
+							//TODO se NACK, reenvia msg
+							//TODO se ERRO, printa erro
+						//}TODO se NACK, reenvia msg
+						//TODO se ERRO, printa erro
 						break;
 					case 8:
 					//get
