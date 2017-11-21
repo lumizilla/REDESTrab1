@@ -21,19 +21,18 @@ int main(){
 		int r = read(soquete, msgRec, MSG_SIZE);
 		//desempacota mensagem
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//TODO conferir se os dados desempacotados conferem
-		
 		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
 		//-2 paridade não confere.
 		//se inicio nao confere soh ignora a mensagem
 		//confere se paridade incorreta responder com NACK
 		if(status == -2){
-			//empacota NACK, NO CAMPO DE DADOS O NUMERO DE SEQ DA MENSAGEM
+			//empacota NACK, NO CAMPO DE DADOS O NUMERO DE SEQ DA MENSAGEM RECEBIDA
+			printf("Mensagem recebida com paidade incoreta \n");
 			unsigned char msgEnviar[MSG_SIZE];
 			unsigned char msg[DATA_SIZE];
 			//itoa(seqRec, msg, 10);
 			snprintf(msg, sizeof(msg), "%d", seqRec);			
-			empacotaMsg(msg, msgEnviar, 15, sequencia, DATA_SIZE);
+			empacotaMsg(msg, msgEnviar, NACK, sequencia, DATA_SIZE);
 			printf("%s\n", msgEnviar);
 			fflush(stdout);
 			write(soquete, msgEnviar, MSG_SIZE); 
@@ -47,6 +46,7 @@ int main(){
 			printf("%s\n", dataRec);
 			switch(tipo){
 				case 6: //cd
+					printf("Recebi um cd: %s\n", msgRec);
 					//TODO Realiza a troca de diretório e responde com ACK
 					//TODO Se ERRO responde com o cod do erro
 					break;
@@ -57,7 +57,12 @@ int main(){
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
 					break;
 				case 9: //put
-					//TODO Responde com ACK/ERRO, se foi um ACK, recebe as mensagens ate o "fim"
+					printf("Recebi um put: %s\n", msgRec);
+					//TODO Responde com ACK/ERRO(se nao tem permissao de escrita)
+						//se foi um ACK, recebe o tamanho do arquivo 
+							//se tem memoria suficiente, responde com ACK
+								//recebe os dados e os salva
+							//se nao tem memoria suficiente, responde com ERRO
 					break;
 				default:
 					printf("ERRO: o tipo da mensagem não confere\n");

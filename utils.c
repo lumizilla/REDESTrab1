@@ -45,6 +45,14 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
+//retona o tam de um arquivo em bytes
+off_t tamArquivo(const char *filename) {
+    struct stat st; 
+    if (stat(filename, &st) == 0)
+        return st.st_size;
+    return -1; 
+}
+
 void apagaRelativos(char *caminho){
 	char *subs[MAX_PATH];
 	/*getting the first substring*/

@@ -44,7 +44,7 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 }
 
 void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
-	//TODO Janela deslizante ?
+	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -55,28 +55,73 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	short tamRec = 0;
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
+
+	//VARIAVEIS A RESPEITO DE MENSAGENS ENVIADAS
+	//tamanho da mensagem(sem overload) a ser enviada	
+	short tamEnv;
+	//mensagem de tamanho do aquivo fica salva aqui
+	unsigned char arqTam[DATA_SIZE];
+
 	while(true){
-		//TODO fazer timeout como no T2
+		//TODO fazer timeout do put como no T2
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//TODO responde com NACK caso paridade nao bata
 		
 		if(seqRec == seqMsg){
 			//aguarda OK
 			if(tipo == OK){
+				//TODO Atualiza timeout	
 				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
-				//TODO envia tamanho
-				//TODO aguarda OK{
-					//TODO envia os dados
-					//TODO aguarda ACK dos dados
-					//TODO se nack de algum dado, reenviar
-					//TODO envia fim{
-						//TODO aguarda OK
-						//TODO se NACK, reenvia msg
-					//	}	
-					//}
-				//TODO se NACK, reenvia msg
-				//TODO se ERRO, printa erro
+				//envia tamanho do arquivo em bytes a ser enviado
+				long int tam_arquivo = tamArquivo(arquivo);
+				sprinf(arqTam, "%d", tam_arquivo);
+				if(tam_arquivo != -1){
+					tamEnv = strlen(arqTam);
+					if(tamMsg <= DATA_SIZE){
+						//mensagem empacotada de tamanho certo
+						char msgEmpacotada[tamMsg+OVERLOAD_SIZE];
+						empacotaMsg(arqTam, msgEmpacotada, TAM, *seq, tamEnv);
+						printf("Enviando tamanho %s\n", arqTam);	
+						fflush(stdout);
+						write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));	
+						*seq = aumentaSeq(*seq);
+						while(true){
+							//TODO fazer timeout do TAM como no T2
+							read(soquete, msgRec, MSG_SIZE);
+							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);		
+							//aguarda OK
+							if(tipo == OK){
+								//TODO Atualiza timeout	
+								//TODO Janela deslizante nos dados
+								//TODO envia os dados
+								//TODO aguarda ACK dos dados
+								//TODO se nack de algum dado, reenviar
+								//TODO envia fim{
+									//TODO aguarda OK
+									//TODO se NACK, reenvia msg
+								//	}	
+								//}
+								return;
+							}
+							//se NACK, reenvia msg
+							else if(tipo == NACK){
+								write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+								//TODO Atualiza timeout	
+							}
+							//se ERRO, printa erro
+							else if(tipo == ERRO){
+								//unico erro que a mensagem de tam pode gerar eh de espaco
+								if(strcmp(dataRec, NAO_ESPACO)){
+									printf("ERRO NO SERVIDOR: Espaço insuficiente.\n");
+								}
+								return;
+							}
+						}
+					}
+				}
+				else{
+					printf("ERRO: problema ao ler tamanho do arquivo.\n");
+				}
 				return;
 			}
 			//se NACK, reenvia msg
