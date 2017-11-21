@@ -46,6 +46,7 @@ int main(){
 			switch(tipo){
 				case 6: //cd
 					//TODO Realiza a troca de diretório e responde com ACK
+					//TODO Se ERRO responde com o cod do erro
 					break;
 				case 7: //ls
 					//TODO Realiza o comando ls, responde com ACK, Envia dados vindos do ls
