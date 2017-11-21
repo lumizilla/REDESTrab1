@@ -43,7 +43,7 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 	}
 }
 
-trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
+void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
 	//TODO Janela deslizante ?
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
