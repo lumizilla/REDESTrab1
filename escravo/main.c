@@ -21,6 +21,8 @@ int main(){
 		int r = read(soquete, msgRec, MSG_SIZE);
 		//desempacota mensagem
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		//TODO conferir se os dados desempacotados conferem
+		
 		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
 		//-2 paridade não confere.
 		//se inicio nao confere soh ignora a mensagem
