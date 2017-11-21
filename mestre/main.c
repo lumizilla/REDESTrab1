@@ -1,6 +1,46 @@
 #include "../utils.c"
 //um char tem 1 byte = 8 bits
 
+void trataCD(char *msg, short seq, short tamMsg, int soquete){
+	//mensagem recebida
+	unsigned char msgRec[MSG_SIZE];
+	//numero de sequencia da mensagem recebida
+	short seqRec = 0;
+	//tamanho de DADOS da mensagem recebida
+	short tamRec = 0;
+	//tipo de mensagem a ser enviada/recebida
+	short tipo = 0;
+	while(true){
+		//TODO fazer timeout
+		read(soquete, msgRec, MSG_SIZE);
+		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		//responde com NACK caso paridade nao bata
+		
+		if(seqRec == seq){
+			//aguarda OK
+			if(tipo == OK){
+				printf("OK: Servidor mudou de diretorio com sucesso.\n");
+				return;
+			}
+			//se NACK, reenvia msg
+			else if(tipo == NACK){
+				write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+				//TODO Atualiza timeout	
+			}
+			//se ERRO, printa erro
+			else if(tipo == ERRO){
+				if(msgRec == NAO_EXISTE){
+					printf(stderr, "ERRO NO SERVIDOR: diretorio nao existe.\n");
+				}
+				else if(msgRec == NAO_PERMITIDO){
+					printf(stderr, "ERRO NO SERVIDOR: Permissao negada.\n");
+				}
+				return;
+			}
+		}
+	}
+}
+
 int main(){
         printf("\niniciando programa mestre(cliente)!\n");        
 	int soquete = ConexaoRawSocket("eno1");
@@ -39,8 +79,8 @@ int main(){
 	printf("lcd 'caminho': cd local\n");
 	printf("rls 'opcoes': ls remoto\n");
 	printf("rcd 'caminho': cd remoto\n");
-	printf("get 'arquivo': pega arquivo do dir corrente\n\t do escravo e coloca no dir corrente do mestre\n");
-	printf("put 'arquivo': pega arquivo do dir corrente\n\t do mestre e coloca no dir corrente do escravo\n");
+	printf("get 'arquivo': pega arquivo do dir corrente\n do escravo e coloca no dir corrente do mestre\n");
+	printf("put 'arquivo': pega arquivo do dir corrente\n do mestre e coloca no dir corrente do escravo\n");
 	printf("--------------------x--------------------\n\n");
 	
 	while(true){
@@ -117,7 +157,6 @@ int main(){
 			else if(strcmp(subs[0], "put") == 0){
 				tipo = 9;
 			}
-
 			tamMsg = strlen(comando_salvo);
 			if(tamMsg <= DATA_SIZE){
 				for(i = 0; i < tamMsg; i++){
@@ -133,17 +172,13 @@ int main(){
 				sequencia = aumentaSeq(sequencia);
 				
 				switch(tipo){
-				//TODO esperar resposta de acordo com o comando previamente enviado
 					//ls
 					case 7:
 					//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
 						break;
 					//cd
 					case 6:
-						//TODO Janela deslizante ?
-						//TODO aguarda OK
-						//TODO se NACK, reenvia msg
-						//TODO se ERRO, printa erro
+						trataCD(msgResto, sequencia-1, tamMsg, soquete);		
 						break;
 					//put
 					case 9:

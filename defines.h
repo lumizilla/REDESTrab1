@@ -37,6 +37,25 @@
 //tamanho maximo do nome de um diretorio com a /
 #define MAX_DIR 31
 
+//tipos das mensagens
+#define ACK 0
+#define TAM 2
+#define OK 3
+#define CD 6
+#define LS 7
+#define GET 8
+#define PUT 9
+#define FIM 10
+#define MOSTRA 12
+#define DADO 13
+#define ERRO 14
+#define NACK 15
+
+//erros
+#define NAO_EXISTE "1"
+#define NAO_PERMITIDO "2"
+#define NAO_ESPACO "3"
+
 typedef struct cont {
 	unsigned short tam : 5,
 		seq : 6,
