@@ -1,9 +1,11 @@
 #include "../utils.c"
 //um char tem 1 byte = 8 bits
 
-void trataCD(char *msg, short seq, short tamMsg, int soquete){
+void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
+	//bits de DADOS da msg recebida
+	unsigned char dataRec[DATA_SIZE];
 	//numero de sequencia da mensagem recebida
 	short seqRec = 0;
 	//tamanho de DADOS da mensagem recebida
@@ -11,12 +13,12 @@ void trataCD(char *msg, short seq, short tamMsg, int soquete){
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 	while(true){
-		//TODO fazer timeout
+		//TODO fazer timeout como no T2
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//responde com NACK caso paridade nao bata
+		//TODO responde com NACK caso paridade nao bata
 		
-		if(seqRec == seq){
+		if(seqRec == seqMsg){
 			//aguarda OK
 			if(tipo == OK){
 				printf("OK: Servidor mudou de diretorio com sucesso.\n");
@@ -29,16 +31,69 @@ void trataCD(char *msg, short seq, short tamMsg, int soquete){
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
-				if(msgRec == NAO_EXISTE){
-					printf(stderr, "ERRO NO SERVIDOR: diretorio nao existe.\n");
+				if(strcmp(dataRec, NAO_EXISTE)){
+					printf("ERRO NO SERVIDOR: diretorio nao existe.\n");
 				}
-				else if(msgRec == NAO_PERMITIDO){
-					printf(stderr, "ERRO NO SERVIDOR: Permissao negada.\n");
+				else if(strcmp(dataRec, NAO_PERMITIDO)){
+					printf("ERRO NO SERVIDOR: Permissao negada.\n");
 				}
 				return;
 			}
 		}
 	}
+}
+
+trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
+	//TODO Janela deslizante ?
+	//mensagem recebida
+	unsigned char msgRec[MSG_SIZE];
+	//bits de DADOS da msg recebida
+	unsigned char dataRec[DATA_SIZE];
+	//numero de sequencia da mensagem recebida
+	short seqRec = 0;
+	//tamanho de DADOS da mensagem recebida
+	short tamRec = 0;
+	//tipo de mensagem a ser enviada/recebida
+	short tipo = 0;
+	while(true){
+		//TODO fazer timeout como no T2
+		read(soquete, msgRec, MSG_SIZE);
+		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		//TODO responde com NACK caso paridade nao bata
+		
+		if(seqRec == seqMsg){
+			//aguarda OK
+			if(tipo == OK){
+				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
+				//TODO envia tamanho
+				//TODO aguarda OK{
+					//TODO envia os dados
+					//TODO aguarda ACK dos dados
+					//TODO se nack de algum dado, reenviar
+					//TODO envia fim{
+						//TODO aguarda OK
+						//TODO se NACK, reenvia msg
+					//	}	
+					//}
+				//TODO se NACK, reenvia msg
+				//TODO se ERRO, printa erro
+				return;
+			}
+			//se NACK, reenvia msg
+			else if(tipo == NACK){
+				write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+				//TODO Atualiza timeout	
+			}
+			//se ERRO, printa erro
+			else if(tipo == ERRO){
+				//unico erro que a mensagem de put inicial pode gerar eh de permissao
+				if(strcmp(dataRec, NAO_PERMITIDO)){
+					printf("ERRO NO SERVIDOR: Permissao negada.\n");
+				}
+				return;
+			}
+		}
+	}		
 }
 
 int main(){
@@ -113,6 +168,9 @@ int main(){
 		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
+		else if(strcmp(subs[1], "") == 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0], "lcd") != 0){
+			printf("ERRO: comando invalido, lcd, rcd, put e get necessitam de mais argumentos.\n");
+		}
 		else if(strcmp(subs[0],"lcd") == 0){		
 			char caminho[MAX_INPUT];
 			strcpy(caminho, "");
@@ -121,7 +179,6 @@ int main(){
 				//se sim apaga o que vem antes dos .. a nao ser que seja o './' inicial
 				strcat(caminho, subs[1]);
 			}
-			printf("o comando local foi cd %s\n", caminho);	
 			if(mudaDir(caminho) == 0 && (caminho != "")){
 				apagaRelativos(caminho);
 				//se nao houve erro, guardar no diretorio corrente
@@ -182,22 +239,7 @@ int main(){
 						break;
 					//put
 					case 9:
-						//TODO Janela deslizante ?
-						//TODO aguarda OK{
-							//TODO envia tamanho
-							//TODO aguarda OK{
-								//TODO envia os dados
-									//TODO aguarda ACK dos dados
-									//TODO se nack de algum dado, reenviar
-								//TODO envia fim{
-									//TODO aguarda OK
-									//TODO se NACK, reenvia msg
-							//	}	
-							//}
-							//TODO se NACK, reenvia msg
-							//TODO se ERRO, printa erro
-						//}TODO se NACK, reenvia msg
-						//TODO se ERRO, printa erro
+						trataPUT(msgResto, sequencia-1, tamMsg, soquete, &sequencia, subs[1]);
 						break;
 					case 8:
 					//get
