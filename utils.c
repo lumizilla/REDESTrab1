@@ -236,6 +236,14 @@ int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 }
 
 void enviaArquivo(char *arquivo, int soquete, long long int tamArq){
+	//TODO Janela deslizante nos dados
+	//TODO envia os dados
+	//TODO aguarda ACK dos dados
+	//TODO se nack de algum dado, reenviar
+	//TODO envia fim{
+		//TODO aguarda OK
+		//TODO se NACK, reenvia msg
+	//	}	
 	return;
 }
 
