@@ -235,19 +235,54 @@ int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 	return 0;
 }
 
-void enviaArquivo(char *arquivo, int soquete, long long int tamArq){
-	//TODO Janela deslizante nos dados
+void enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
+	//TODO Janela deslizante de tam=3 com repeticao seleiva e timeout nos dados
+	//abre arquivo	
 	//TODO envia os dados
-	//TODO aguarda ACK dos dados
-	//TODO se nack de algum dado, reenviar
+	//indica a mensagem mais a esquerda da janela
+	//int janelaInicio = *seq+1;
+	//indica a mensagem mais a direita da janela
+	//int janelaFim = janelaInicio+2;
+	//enquanto nao tiver enviado tudo{
+		//envia pedaco1
+		//envia pedaco2
+		//envia pedaco3
+		//recebe mensagem		
+		//se mensagem = ACK pedaco1
+			//anda janela 1 posicao (pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+			//se pedaco1 ja foi recebido
+				//anda janela 1 posicao (pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+				//se pedaco3 ja foi recebido
+					//anda janela 1 posicao (pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+		//se mensagem = ACK pedaco2
+			//grava que pedaco 2 ja foi recebido
+		//se mensagem = ACK pedaco3
+			//grava que pedaco 2 ja foi recebido
+		//TODO se nack de algum pecado, reenviar pedaco
+		//testatimeouts
+	//}
 	//TODO envia fim{
 		//TODO aguarda OK
 		//TODO se NACK, reenvia msg
-	//	}	
+	//	}
+	//}
 	return;
 }
 
 void recebeArquivo(char *arquivo, int soquete, long long int tamArq){
-//TODO com janela deslizante, recebe os dados e os salva
+	//TODO com janela deslizante e timeout, recebe os dados e os salva
+
+	//recebe pedaco1
+		//ack pedaco1
+		//salva no lugar certo
+	//indica a mensagem mais a esquerda da janela
+	//int janelaInicio = seq do pedaco2;
+	//int janelaFim = janelaInicio + 2
+	//enquanto nao tiver recebido todos os pedacos
+		//recebe pedaco
+			//ack pedaco
+			//salva no lugar certo
+	//abre novo arquivo com nome = arquivo	
+	//escreve no arquivo
 	return;
 }
