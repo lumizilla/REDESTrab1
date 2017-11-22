@@ -70,13 +70,13 @@ int main(){
 						unsigned char msgEnviar[MSG_SIZE];
 						if(error == EACCES){			
 							empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
-							printf("%s\n", msgEnviar);
+							printf("nao permitido %s\n", msgEnviar);
 							fflush(stdout);
 							write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
 						}
 						else{
 							empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_EXISTE));
-							printf("%s\n", msgEnviar);
+							printf("nao existe %s\n", msgEnviar);
 							fflush(stdout);
 							write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE); 
 						}

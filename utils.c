@@ -172,7 +172,6 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 	for(int i = 2; i < tam + 3; i++){
 		atual = msgEnviar[i];			
 		//Irei fazer um AND dos chars
-		printf("ant: %d , atual: %d \n", anterior, atual);
 		anterior = atual & anterior;
 	}
 	paridade = anterior;
@@ -200,8 +199,6 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	//retornar tipo da mensagem
 	*tipo = ctrl.tipo;
 	//retornar dados extraidos
-	printf("aqui2, tam = %d, tam msg=%d, msg=%s, tam data=%d\n", *tam, (int)strlen(msg), msg, (int)strlen(data));
-	fflush(stdout);
 	for(int i = 3; i < *tam+3; i++){
 		data[i-3] = msg[i];
 	}
@@ -214,10 +211,8 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	for(int i = 2; i < *tam + 3; i++){
 		atual = msg[i];			
 		//Irei fazer um AND dos chars
-		printf("ant: %d , atual: %d \n", anterior, atual);
 		anterior = atual & anterior;
 	}
-	printf("\npar %d, ant %d\n", paridade, anterior);
 	if(paridade != anterior){
 		printf("ERRO: A paridade não confere\n");
 		return -2;

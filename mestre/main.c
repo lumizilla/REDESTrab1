@@ -31,10 +31,12 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
-				if(strcmp(dataRec, NAO_EXISTE)){
-					printf("ERRO NO SERVIDOR: diretorio nao existe.\n");
+				printf("%s\n", dataRec);
+				fflush(stdout);
+				if(strcmp(dataRec, NAO_EXISTE) == 0){
+					printf("ERRO NO SERVIDOR: Diretorio nao existe.\n");
 				}
-				else if(strcmp(dataRec, NAO_PERMITIDO)){
+				else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
 					printf("ERRO NO SERVIDOR: Permissao negada.\n");
 				}
 				return;
@@ -269,8 +271,6 @@ int main(){
 				//mensagem empacotada de tamanho certo
 				char msgResto[tamMsg+OVERLOAD_SIZE];
 				empacotaMsg(comando, msgResto, tipo, sequencia, tamMsg);
-				printf("%s\n", msgResto);
-				fflush(stdout);
 				write(soquete, msgResto, (tamMsg+OVERLOAD_SIZE));	
 				sequencia = aumentaSeq(sequencia);
 				
