@@ -106,37 +106,42 @@ int main(){
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
-					if(checaPermissao(subs[1]) == 0){
-						//Responde com ACK
+					//checa se pode escrever neste diretorio
+					if(access("./", W_OK) == 0){
+						//Responde com OK
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
-						printf("%s\n", msgEnviar);
+						printf("pode escrever neste diretorio %s\n", msgEnviar);
 						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
-						//se foi um ACK, recebe o tamanho do arquivo
-							//recebe mensagem
-							int r = read(soquete, msgRec, MSG_SIZE);
-							//desempacota mensagem
-							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-							if(checaMemoria(dataRec) == 0){
-								//se tem memoria suficiente, responde com ACK
-									//recebe os dados e os salva
-							}
-							else{
-								//se nao tem memoria suficiente, responde com ERRO
-							}
+						//se foi um OK, recebe o tamanho do arquivo
+						//recebe mensagem
+						int r = read(soquete, msgRec, MSG_SIZE);
+						//desempacota mensagem
+						int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+						if(checaMemoria(dataRec) == 0){
+							//se tem memoria suficiente, responde com ACK
+								//TODO com janela deslizante, recebe os dados e os salva
+						}
+						else{
+							//se nao tem memoria suficiente, responde com ERRO
+							empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
+							printf("nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
+							fflush(stdout);
+							write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE); 
+						}
 					}
 					//ERRO(se nao tem permissao de escrita)
 					else{
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
-						printf("nao permitido %s\n", msgEnviar);
+						printf("nao permitido: %s\n", msgEnviar);
 						fflush(stdout);
 						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
 					}
 					break;
 				default:
-					printf("ERRO: o tipo da mensagem não confere\n");
+					printf("ERRO: o tipo de comando não confere\n");
 			}
 		}	
 	}	
