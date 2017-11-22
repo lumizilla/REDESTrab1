@@ -74,7 +74,8 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
 				//envia tamanho do arquivo em bytes a ser enviado
 				long int tam_arquivo = tamArquivo(arquivo);
-				sprinf(arqTam, "%d", tam_arquivo);
+				//sprinf(arqTam, "%d", tam_arquivo);
+				snprintf(arqTam, sizeof(arqTam), "%d", seqRec);
 				if(tam_arquivo != -1){
 					tamEnv = strlen(arqTam);
 					if(tamMsg <= DATA_SIZE){

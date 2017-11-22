@@ -15,7 +15,10 @@ int main(){
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
 	unsigned char dataRec[DATA_SIZE];
-
+	//para guardar o input do usuario
+	char *input;
+	//TODO alterar para subs ter tamanho qualquer
+	char *subs[3];
 	while(true){
 		//recebe mensagem
 		int r = read(soquete, msgRec, MSG_SIZE);
@@ -26,29 +29,58 @@ int main(){
 		//se inicio nao confere soh ignora a mensagem
 		//confere se paridade incorreta responder com NACK
 		if(status == -2){
-			//empacota NACK, NO CAMPO DE DADOS O NUMERO DE SEQ DA MENSAGEM RECEBIDA
-			printf("Mensagem recebida com paidade incoreta \n");
+			//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
+			printf("Mensagem recebida com paridade incoreta \n");
 			unsigned char msgEnviar[MSG_SIZE];
-			unsigned char msg[DATA_SIZE];
 			//itoa(seqRec, msg, 10);
-			snprintf(msg, sizeof(msg), "%d", seqRec);			
-			empacotaMsg(msg, msgEnviar, NACK, sequencia, DATA_SIZE);
+			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 			printf("%s\n", msgEnviar);
 			fflush(stdout);
-			write(soquete, msgEnviar, MSG_SIZE); 
+			write(soquete, msgEnviar, OVERLOAD_SIZE); 
 			sequencia = aumentaSeq(sequencia);
 		}
 		//confere o tamanho da mensagem
 		//confere qual a sequencia da mensagem
 		if(status == 0){
-			//TODO cria resposta adequada para cada tipo de mensagem
-			printf("%d\n", r);
-			printf("%s\n", dataRec);
+			//cria resposta adequada para cada tipo de mensagem
 			switch(tipo){
 				case 6: //cd
-					printf("Recebi um cd: %s\n", msgRec);
-					//TODO Realiza a troca de diretório e responde com ACK
-					//TODO Se ERRO responde com o cod do erro
+					printf("Recebi um cd: %s\n", dataRec);
+					/*getting the first substring*/
+					input = strtok(dataRec, " \n");
+					/*walking trough the other substrings*/
+					int i = 0;	
+					while(input != NULL){
+						subs[i] = input;
+						input = strtok(NULL, " \n");
+						i = i+1;
+					}
+					//TODO para o ls, guardar o dir corrente
+					int error = mudaDir(subs[1]);
+					//responde com ACK
+					if(error == 0){
+						unsigned char msgEnviar[MSG_SIZE];
+						empacotaMsg("", msgEnviar, OK, seqRec, 0);
+						printf("%s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, OVERLOAD_SIZE); 
+					}
+					//Se ERRO responde com o cod do erro
+					else{
+						unsigned char msgEnviar[MSG_SIZE];
+						if(error == EACCES){			
+							empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
+							printf("%s\n", msgEnviar);
+							fflush(stdout);
+							write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
+						}
+						else{
+							empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_EXISTE));
+							printf("%s\n", msgEnviar);
+							fflush(stdout);
+							write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE); 
+						}
+					}
 					break;
 				case 7: //ls
 					//TODO Realiza o comando ls, responde com ACK, Envia dados vindos do ls
