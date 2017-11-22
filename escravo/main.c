@@ -28,6 +28,7 @@ int main(){
 		//recebe mensagem
 		int r = read(soquete, msgRec, MSG_SIZE);
 		//desempacota mensagem
+		strcpy(dataRec, "");
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
 		//-2 paridade não confere.
@@ -110,7 +111,7 @@ int main(){
 						//Responde com OK
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
-						printf("pode escrever neste diretorio.");
+						printf("pode escrever neste diretorio.\n");
 						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
 						//se foi um OK, recebe o tamanho do arquivo
@@ -118,6 +119,7 @@ int main(){
 							//recebe mensagem
 							int r = read(soquete, msgRec, MSG_SIZE);
 							//desempacota mensagem
+							strcpy(dataRec, "");	
 							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 							//se inicio nao confere soh ignora a mensagem
 							//se paridade nao confere envia nack
