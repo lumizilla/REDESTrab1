@@ -198,7 +198,7 @@ int empacotaMsg(char *msg, char *msgEnviar, short tipo, short seq, short tam){
 //retorna 0 para nenhum erro
 //-1 para erro de inicio
 //-2 para erro de paridade
-int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *tam, short *tipo){
+int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 	//Verificar inicio
 	if(msg[0] != 0x7E){
 		//printf("ERRO: O inicio da mensagem %s não confere\n", msg);
@@ -215,8 +215,8 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	//retornar tipo da mensagem
 	*tipo = ctrl.tipo;
 	//retornar dados extraidos
-	for(int i = 3; i < *tam+3; i++){
-		data[i-3] = msg[i];
+	for(int i = 3; i < *tam+3; i++){		
+		data[i-3]= msg[i];
 	}
 	//verificar se paridade bate
 	char paridade = msg[*tam+3];
