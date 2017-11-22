@@ -30,6 +30,7 @@ int main(){
 		//desempacota mensagem
 		strcpy(dataRec, "");
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		dataRec[tamRec] = 0x00; 
 		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
 		//-2 paridade não confere.
 		//se inicio nao confere soh ignora a mensagem
@@ -63,8 +64,6 @@ int main(){
 					if(error == 0){
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
-						printf("%s\n", msgEnviar);
-						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
 						apagaRelativos(subs[1]);
 						//se nao houve erro, guardar no diretorio corrente
@@ -135,6 +134,7 @@ int main(){
 								if(checaMemoria("./", dataRec) == 0){
 									//se tem memoria suficiente, responde com ACK
 									empacotaMsg("", msgEnviar, OK, seqRec, 0);
+									dataRec[tamRec] = 0x00; 
 									printf("tem espaco para escrever arq de tam: %s\n", dataRec);
 									fflush(stdout);
 									write(soquete, msgEnviar, OVERLOAD_SIZE); 
