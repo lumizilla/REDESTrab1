@@ -37,7 +37,6 @@ int main(){
 			//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
 			printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
 			unsigned char msgEnviar[MSG_SIZE];
-			//itoa(seqRec, msg, 10);
 			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 			write(soquete, msgEnviar, OVERLOAD_SIZE); 
 			sequencia = aumentaSeq(sequencia);
@@ -115,20 +114,39 @@ int main(){
 						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
 						//se foi um OK, recebe o tamanho do arquivo
-						//recebe mensagem
-						int r = read(soquete, msgRec, MSG_SIZE);
-						//desempacota mensagem
-						int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-						if(checaMemoria("./", dataRec) == 0){
-							//se tem memoria suficiente, responde com ACK
-								//TODO com janela deslizante, recebe os dados e os salva
-						}
-						else{
-							//se nao tem memoria suficiente, responde com ERRO
-							empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
-							printf("nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
-							fflush(stdout);
-							write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE); 
+						while(true){
+							//recebe mensagem
+							int r = read(soquete, msgRec, MSG_SIZE);
+							//desempacota mensagem
+							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+							//se inicio nao confere soh ignora a mensagem
+							//se paridade nao confere envia nack
+							if(status == -2){
+								//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
+								printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
+								unsigned char msgEnviar[MSG_SIZE];
+								empacotaMsg("", msgEnviar, NACK, seqRec, 0);
+								write(soquete, msgEnviar, OVERLOAD_SIZE); 
+								sequencia = aumentaSeq(sequencia);
+							}
+							else if(status == 0){
+								if(checaMemoria("./", dataRec) == 0){
+									//se tem memoria suficiente, responde com ACK
+									empacotaMsg("", msgEnviar, OK, seqRec, 0);
+									printf("tem espaco para escrever arq de tam: %s\n", msgEnviar);
+									fflush(stdout);
+									write(soquete, msgEnviar, OVERLOAD_SIZE); 
+										//TODO com janela deslizante, recebe os dados e os salva
+								}
+								else{
+									//se nao tem memoria suficiente, responde com ERRO
+									empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
+									printf("nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
+									fflush(stdout);
+									write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE); 
+								}
+								break;
+							}
 						}
 					}
 					//ERRO(se nao tem permissao de escrita)
