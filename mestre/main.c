@@ -75,9 +75,9 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				//TODO Atualiza timeout	
 				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
 				//envia tamanho do arquivo em bytes a ser enviado
-				long int tam_arquivo = tamArquivo(arquivo);
+				long long int tam_arquivo = tamArquivo(arquivo);
 				//sprinf(arqTam, "%d", tam_arquivo);
-				snprintf(arqTam, sizeof(arqTam), "%d", seqRec);
+				snprintf(arqTam, sizeof(arqTam), "%lld", tam_arquivo);
 				if(tam_arquivo != -1){
 					tamEnv = strlen(arqTam);
 					if(tamMsg <= DATA_SIZE){
@@ -262,6 +262,7 @@ int main(){
 			}
 			else if(strcmp(subs[0], "put") == 0){
 				tipo = 9;
+				//TODO checa se arquivo existe antes de enviar
 			}
 			tamMsg = strlen(comando_salvo);
 			if(tamMsg <= DATA_SIZE){

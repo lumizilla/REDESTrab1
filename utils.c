@@ -46,7 +46,7 @@ int ConexaoRawSocket(char *device)
 }
 
 //retona o tam de um arquivo em bytes
-off_t tamArquivo(const char *filename) {
+long long int tamArquivo(char *filename) {
     struct stat st; 
     if (stat(filename, &st) == 0)
         return st.st_size;

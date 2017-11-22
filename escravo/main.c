@@ -110,7 +110,7 @@ int main(){
 						//Responde com OK
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
-						printf("pode escrever neste diretorio %s\n", msgEnviar);
+						printf("pode escrever neste diretorio.");
 						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
 						//se foi um OK, recebe o tamanho do arquivo
@@ -133,7 +133,7 @@ int main(){
 								if(checaMemoria("./", dataRec) == 0){
 									//se tem memoria suficiente, responde com ACK
 									empacotaMsg("", msgEnviar, OK, seqRec, 0);
-									printf("tem espaco para escrever arq de tam: %s\n", msgEnviar);
+									printf("tem espaco para escrever arq de tam: %s\n", dataRec);
 									fflush(stdout);
 									write(soquete, msgEnviar, OVERLOAD_SIZE); 
 										//TODO com janela deslizante, recebe os dados e os salva
