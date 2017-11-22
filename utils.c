@@ -235,7 +235,11 @@ int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 	return 0;
 }
 
-void enviaArquivo(char *arquivo, int soquete){
+void enviaArquivo(char *arquivo, int soquete, long long int tamArq){
+	return;
+}
 
+void recebeArquivo(char *arquivo, int soquete, long long int tamArq){
+//TODO com janela deslizante, recebe os dados e os salva
 	return;
 }

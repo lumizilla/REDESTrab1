@@ -138,7 +138,7 @@ int main(){
 									printf("tem espaco para escrever arq de tam: %s\n", dataRec);
 									fflush(stdout);
 									write(soquete, msgEnviar, OVERLOAD_SIZE); 
-										//TODO com janela deslizante, recebe os dados e os salva
+									recebeArquivo(subs[1], soquete, atoll(dataRec));
 								}
 								else{
 									//se nao tem memoria suficiente, responde com ERRO
