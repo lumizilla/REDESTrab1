@@ -76,13 +76,11 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
 				//envia tamanho do arquivo em bytes a ser enviado
 				long long int tam_arquivo = tamArquivo(arquivo);
-				//sprinf(arqTam, "%d", tam_arquivo);
-				snprintf(arqTam, sizeof(arqTam), "%lld", tam_arquivo);
+				tamEnv = sprintf(arqTam, "%lld", tam_arquivo);
 				if(tam_arquivo != -1){
-					tamEnv = strlen(arqTam);
 					if(tamMsg <= DATA_SIZE){
 						//mensagem empacotada de tamanho certo
-						char msgEmpacotada[tamMsg+OVERLOAD_SIZE];
+						char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
 						empacotaMsg(arqTam, msgEmpacotada, TAM, *seq, tamEnv);
 						printf("Enviando tamanho %s\n", arqTam);	
 						fflush(stdout);
@@ -97,16 +95,6 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 								//TODO Atualiza timeout	
 								printf("OK para escrever, memoria suficiente.\n");
 								enviaArquivo(arquivo, soquete);
-								//TODO Atualiza timeout	
-								//TODO Janela deslizante nos dados
-								//TODO envia os dados
-								//TODO aguarda ACK dos dados
-								//TODO se nack de algum dado, reenviar
-								//TODO envia fim{
-									//TODO aguarda OK
-									//TODO se NACK, reenvia msg
-								//	}	
-								//}
 								return;
 							}
 							//se NACK, reenvia msg
