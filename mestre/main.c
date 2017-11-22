@@ -94,7 +94,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 							if(tipo == OK){
 								//TODO Atualiza timeout	
 								printf("OK para escrever, memoria suficiente.\n");
-								enviaArquivo(arquivo, soquete);
+								enviaArquivo(arquivo, soquete, tam_arquivo);
 								return;
 							}
 							//se NACK, reenvia msg
