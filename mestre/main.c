@@ -223,8 +223,6 @@ int main(){
 			char caminho[MAX_INPUT];
 			strcpy(caminho, "");
 			if(subs[1] != NULL){
-				//testar se o path novo eh muito grande e se tem "..", 
-				//se sim apaga o que vem antes dos .. a nao ser que seja o './' inicial
 				strcat(caminho, subs[1]);
 			}
 			if(mudaDir(caminho) == 0 && (caminho != "")){

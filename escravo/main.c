@@ -19,6 +19,11 @@ int main(){
 	char *input;
 	//TODO alterar para subs ter tamanho qualquer
 	char *subs[3];
+	//guarda o PATH do diretorio corrente
+	char path[MAX_INPUT] = "./";
+
+	//auxiliares
+	int i;
 	while(true){
 		//recebe mensagem
 		int r = read(soquete, msgRec, MSG_SIZE);
@@ -30,12 +35,10 @@ int main(){
 		//confere se paridade incorreta responder com NACK
 		if(status == -2){
 			//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
-			printf("Mensagem recebida com paridade incoreta \n");
+			printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
 			unsigned char msgEnviar[MSG_SIZE];
 			//itoa(seqRec, msg, 10);
 			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
-			printf("%s\n", msgEnviar);
-			fflush(stdout);
 			write(soquete, msgEnviar, OVERLOAD_SIZE); 
 			sequencia = aumentaSeq(sequencia);
 		}
@@ -49,13 +52,12 @@ int main(){
 					/*getting the first substring*/
 					input = strtok(dataRec, " \n");
 					/*walking trough the other substrings*/
-					int i = 0;	
+					i = 0;	
 					while(input != NULL){
 						subs[i] = input;
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
-					//TODO para o ls, guardar o dir corrente
 					int error = mudaDir(subs[1]);
 					//responde com ACK
 					if(error == 0){
@@ -64,6 +66,10 @@ int main(){
 						printf("%s\n", msgEnviar);
 						fflush(stdout);
 						write(soquete, msgEnviar, OVERLOAD_SIZE); 
+						apagaRelativos(subs[1]);
+						//se nao houve erro, guardar no diretorio corrente
+						//TODO para o ls, checar se da certo o ls de acordo com o cd
+						strcpy(path, subs[1]);
 					}
 					//Se ERRO responde com o cod do erro
 					else{
@@ -89,12 +95,45 @@ int main(){
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
 					break;
 				case 9: //put
-					printf("Recebi um put: %s\n", msgRec);
-					//TODO Responde com ACK/ERRO(se nao tem permissao de escrita)
-						//se foi um ACK, recebe o tamanho do arquivo 
-							//se tem memoria suficiente, responde com ACK
-								//recebe os dados e os salva
-							//se nao tem memoria suficiente, responde com ERRO
+					printf("Recebi um put: %s\n", dataRec);
+					fflush(stdout);
+					/*getting the first substring*/
+					input = strtok(dataRec, " \n");
+					/*walking trough the other substrings*/
+					i = 0;	
+					while(input != NULL){
+						subs[i] = input;
+						input = strtok(NULL, " \n");
+						i = i+1;
+					}
+					if(checaPermissao(subs[1]) == 0){
+						//Responde com ACK
+						unsigned char msgEnviar[MSG_SIZE];
+						empacotaMsg("", msgEnviar, OK, seqRec, 0);
+						printf("%s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, OVERLOAD_SIZE); 
+						//se foi um ACK, recebe o tamanho do arquivo
+							//recebe mensagem
+							int r = read(soquete, msgRec, MSG_SIZE);
+							//desempacota mensagem
+							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+							if(checaMemoria(dataRec) == 0){
+								//se tem memoria suficiente, responde com ACK
+									//recebe os dados e os salva
+							}
+							else{
+								//se nao tem memoria suficiente, responde com ERRO
+							}
+					}
+					//ERRO(se nao tem permissao de escrita)
+					else{
+						unsigned char msgEnviar[MSG_SIZE];
+						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
+						printf("nao permitido %s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
+					}
 					break;
 				default:
 					printf("ERRO: o tipo da mensagem não confere\n");
