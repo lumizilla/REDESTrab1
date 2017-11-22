@@ -2,6 +2,7 @@
 #include <sys/socket.h> 
 #include <sys/ioctl.h> 
 #include <sys/stat.h>
+#include <sys/statvfs.h>
 #include <net/ethernet.h> 
 #include <linux/if_packet.h> 
 #include <linux/if.h> 

@@ -53,6 +53,22 @@ off_t tamArquivo(const char *filename) {
     return -1; 
 }
 
+long long int checaMemoria(char *path, char* tam){
+	struct statvfs stat;
+	if(statvfs(path,&stat) != 0){
+		//ocorreu um erro
+		return -1;
+	}
+	//tamanho do bloco * numero de blocos disponiveis = bytes disponiveis
+	if(atol(tam) <= stat.f_bsize * stat.f_bavail){
+		return 0;
+	}
+	else{
+		//tamanho eh grande demais
+		return -1;
+	}
+}
+
 void apagaRelativos(char *caminho){
 	char *subs[MAX_PATH];
 	/*getting the first substring*/

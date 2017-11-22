@@ -119,7 +119,7 @@ int main(){
 						int r = read(soquete, msgRec, MSG_SIZE);
 						//desempacota mensagem
 						int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-						if(checaMemoria(dataRec) == 0){
+						if(checaMemoria("./", dataRec) == 0){
 							//se tem memoria suficiente, responde com ACK
 								//TODO com janela deslizante, recebe os dados e os salva
 						}
