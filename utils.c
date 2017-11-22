@@ -222,7 +222,6 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 	char paridade = msg[*tam+3];
 	char atual;
 	char anterior;
-	char auxx;	
 	anterior = msg[1];
 	for(int i = 2; i < *tam + 3; i++){
 		atual = msg[i];			
@@ -234,4 +233,9 @@ int desempacotaMsg(unsigned char *msg, unsigned char *data, short *seq, short *t
 		return -2;
 	}
 	return 0;
+}
+
+void enviaArquivo(char *arquivo, int soquete){
+
+	return;
 }
