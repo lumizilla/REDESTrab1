@@ -273,6 +273,8 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	empacotaMsg(pedaco1, mensagem, DADO, *seq, DATA_SIZE);
 	*seq = aumentaSeq(*seq);
 	write(soquete, mensagem, MSG_SIZE); 
+	//TODO aguada ACK desta mensagem antes de continuar
+
 	//envia pedaco2
 	char pedaco2[DATA_SIZE];
 	resultado = fread(pedaco2, DATA_SIZE, 1, fp);
@@ -452,21 +454,103 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	return -1;
 }
 
-void recebeArquivo(char *arquivo, int soquete, long long int tamArq){
+int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 	//TODO com janela deslizante e timeout, recebe os dados e os salva
+	
+	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
+	//mensagem recebida
+	unsigned char msgRec[MSG_SIZE];
+	//bits de DADOS da msg recebida
+	unsigned char dataRec[DATA_SIZE];
+	//numero de sequencia da mensagem recebida
+	short seqRec = 0;
+	//tamanho de DADOS da mensagem recebida
+	short tamRec = 0;
+	//tipo de mensagem a ser enviada/recebida
+	short tipo = 0;
+	
+	//msg a ser enviada de ACK/NACK
+	unsigned char msgStatus[OVERLOAD_SIZE];
+	
+	//marca quais pacotes foram recebidos
+	int pedacos[3];
+	pedacos[0] = 0;
+	pedacos[1] = 0;
+	pedacos[2] = 0;
+	
+	//variaveis a respeito de cada um dos pedacos que foram recebidos
+	unsigned char data[3][DATA_SIZE];
+	short seq[3];	
+	short tam[3];
 
-	//TODO recebe primeiro pedaco
+	//abre novo arquivo com nome = arquivo	
+	//abre arquivo	
+	FILE *fp;
+	fp = fopen(arquivo, "w");
+	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para escrita\n",stderr); return -1;}
 	//recebe seq do primeiro pedaco recebido
 	int janelaInicio;
+	//recebe primeiro pedaco
+	//recebe mensagem
+	read(soquete, msgRec, MSG_SIZE);
+	int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+	//se nao houve erro de paridade e nem de inicio
+	if(status == 0 && tipo == DADO){
+		janelaInicio = seqRec;
+		//envia ACK
+		empacotaMsg("", msgStatus, ACK, seqRec, 0);
+		write(soquete, msgStatus, OVERLOAD_SIZE); 
+		//escreve no arquivo		
+		fwrite(dataRec, tamRec, 1, fp); 
+		janelaInicio = aumentaSeq(janelaInicio);
+	}else{return -1;}
+	
 	int janelaFim = aumentaSeq(janelaInicio);
 	janelaFim = aumentaSeq(janelaFim);
 	//enquanto nao tiver recebido todos os pedacos
-		//recebe pedaco
+	while(true){
+		while(true){
+			//recebe pedaco
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			
+			//se pedaco == FIM, envia ACK
+			if(tipo == FIM){
+				//envia ACK
+				empacotaMsg("", msgStatus, ACK, seqRec, 0);
+				write(soquete, msgStatus, OVERLOAD_SIZE); 
+				fclose(fp);	
+				return 0;			
+			}
+
+			//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
+			//TODO envia ACK dela e nao da break
+
+			//SE PEDACO ESTA DENTRO DA JANELA						
 			//se pedaco 1, break
+			else if(seqRec == janelaInicio){
+				pedacos[0] = 1;
+				strcpy(data[0], dataRec);
+				seq[0] = seqRec;
+				break;
+			}			
 			//se pedaco 2, e 1 nao foi recebido, aguarda 1
+			else if(seqRec == aumentaSeq(janelaInicio) && pedacos[0] == 0){
+				//TODO
+			}			
 			//se pedaco 2, e 1 foi recebido break
+			else if(seqRec == aumentaSeq(janelaInicio) && pedacos[0] == 1){
+				//TODO
+			}	
 			//se pedaco 3, e 2 ou 1 nao foram recebidos, aguarda 2 e 1
+			else if(seqRec == janelaFim && (pedacos[0] == 0 || pedacos[1] == 0)){
+				//TODO
+			}	
 			//se pedaco 3, e 2 e 1 foram recebidos break
+			else if(seqRec == janelaFim && pedacos[0] == 1 && pedacos[1] == 1){
+				//TODO
+			}	
+		}
 		//maneja pedacos
 		//se existe soh pedaco1 
 			//se erro, NACK pedaco1
@@ -488,13 +572,6 @@ void recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 				//anda janela 2 posicoes, salva pedacos 1 e 2
 			//se nao, ACK pedaco3
 				//anda janela 3 posicoes, salva pedacos 1, 2 e 3
-
-	//abre novo arquivo com nome = arquivo	
-	//abre arquivo	
-	FILE *fp;
-	fp = fopen(arquivo, "w");
-	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para escrita\n",stderr); return -1;}
-
-	//escreve no arquivo
-	return;
+	}
+	return 0;
 }
