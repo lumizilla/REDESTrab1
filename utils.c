@@ -256,7 +256,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	//abre arquivo	
 	FILE *fp;
 	fp = fopen(arquivo, "r");
-	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para leitura",stderr); return -1;}
+	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para leitura\n",stderr); return -1;}
 	
 	//envia os dados
 
@@ -264,7 +264,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	int janelaInicio = *seq;
 	//indica a mensagem mais a direita da janela, tem que aumentar 2 vezes ja que janela tem tam = 3
 	int janelaFim = aumentaSeq(janelaInicio);
-	janelaFim = aumentaSeq(janelaInicio);
+	janelaFim = aumentaSeq(janelaFim);
 
 	//envia pedaco1
 	char pedaco1[DATA_SIZE];
@@ -455,17 +455,46 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 void recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 	//TODO com janela deslizante e timeout, recebe os dados e os salva
 
-	//recebe pedaco1
-		//ack pedaco1
-		//salva no lugar certo
-	//indica a mensagem mais a esquerda da janela
-	//int janelaInicio = seq do pedaco2;
-	//int janelaFim = janelaInicio + 2
+	//TODO recebe primeiro pedaco
+	//recebe seq do primeiro pedaco recebido
+	int janelaInicio;
+	int janelaFim = aumentaSeq(janelaInicio);
+	janelaFim = aumentaSeq(janelaFim);
 	//enquanto nao tiver recebido todos os pedacos
 		//recebe pedaco
-			//ack pedaco
-			//salva no lugar certo
+			//se pedaco 1, break
+			//se pedaco 2, e 1 nao foi recebido, aguarda 1
+			//se pedaco 2, e 1 foi recebido break
+			//se pedaco 3, e 2 ou 1 nao foram recebidos, aguarda 2 e 1
+			//se pedaco 3, e 2 e 1 foram recebidos break
+		//maneja pedacos
+		//se existe soh pedaco1 
+			//se erro, NACK pedaco1
+			//se nao, ACK pedaco1
+				//anda janela 1 posicao
+				//salva no lugar certo
+		//se existe soh pedaco 1 e pedaco2
+			//se erro no pedaco1, NACK pedaco1
+			//se nao, se erro no pedaco2, NACK pedaco2
+				//anda janela 1 posicao, salva pedaco 1
+			//se nao, ACK pedaco2
+				//anda janela 2 posicoes, salva pedacos 1 e 2
+				//salva no lugar certo
+		//se existe pedaco1 2 e 3
+			//se erro no pedaco1, NACK pedaco1
+			//se nao, se erro no pedaco2, NACK pedaco2
+				//anda janela 1 posicao, salva pedaco 1
+			//se nao se erro pedaco3, NACK pedaco3
+				//anda janela 2 posicoes, salva pedacos 1 e 2
+			//se nao, ACK pedaco3
+				//anda janela 3 posicoes, salva pedacos 1, 2 e 3
+
 	//abre novo arquivo com nome = arquivo	
+	//abre arquivo	
+	FILE *fp;
+	fp = fopen(arquivo, "w");
+	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para escrita\n",stderr); return -1;}
+
 	//escreve no arquivo
 	return;
 }
