@@ -54,7 +54,6 @@ int main(){
 					input = strtok(dataRec, " \n");
 					/*walking trough the other substrings*/
 					i = 0;
-					printf("segfault?\n");
 					while(input != NULL){
 						subs[i] = input;
 						input = strtok(NULL, " \n");
@@ -63,13 +62,10 @@ int main(){
 					int error = mudaDir(subs[1]);
 					//responde com ACK
 					if(error == 0){
-						printf("segfault?\n");
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
 						write(soquete, msgEnviar, OVERLOAD_SIZE);
-						printf("segfault?\n");
 						apagaRelativos(subs[1]);
-						printf("segfault?\n");
 						//se nao houve erro, guardar no diretorio corrente
 						//TODO para o ls, checar se da certo o ls de acordo com o cd
 						strcpy(path, subs[1]);

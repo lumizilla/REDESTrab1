@@ -71,6 +71,7 @@ long long int checaMemoria(char *path, char* tam){
 
 void apagaRelativos(char *caminho){
 	//TODO aqui ta dando segfault por algum motivo
+	printf("segfault?\n");
 	char *subs[MAX_PATH];
 	/*getting the first substring*/
 	char *input = strtok(caminho, "/");	
@@ -104,6 +105,7 @@ void apagaRelativos(char *caminho){
 			subs[1]	= "";
 		}
 	}
+	printf("segfault?\n");
 	//colocando tudo o que nao eh vazio de volta novamente em uma string
 	char retorno[MAX_DIR*MAX_PATH];
 	strcpy(retorno, "");
