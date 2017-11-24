@@ -16,9 +16,7 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 		//TODO fazer timeout como no T2
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//TODO responde com NACK caso paridade nao bata
-
-		if(seqRec == seqMsg){
+		if(seqRec == seqMsg && status == 0){
 			//aguarda OK
 			if(tipo == OK){
 				printf("OK: Servidor mudou de diretorio com sucesso.\n");
@@ -257,6 +255,10 @@ int main(){
 		else if(strcmp(subs[1], "") == 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0], "lcd") != 0){
 			printf("ERRO: comando invalido, lcd, rcd, put e get necessitam de mais argumentos.\n");
 		}
+		//checa se arquivo existe antes de enviar
+		else if(strcmp(subs[0], "put") == 0 && access(subs[1], F_OK) == -1){
+			printf("ERRO: arquivo especificado por put nao existe!\n");
+		}
 		else if(strcmp(subs[0],"lcd") == 0){
 			char caminho[MAX_INPUT];
 			strcpy(caminho, "");
@@ -297,7 +299,6 @@ int main(){
 			}
 			else if(strcmp(subs[0], "put") == 0){
 				tipo = 9;
-				//TODO checa se arquivo existe antes de enviar
 			}
 			tamMsg = strlen(comando_salvo);
 			if(tamMsg <= DATA_SIZE){
@@ -341,59 +342,3 @@ int main(){
 	}
 }
 
-/*
-//descobre o numero de mensagens que precisarao ser enviadas para isso
-			tamMsg = strlen(comando_salvo);
-			numMensagens = ceil((tamMsg/DATA_SIZE));
-			//printf("tipo %d, nummsg %d, tammsg %d\n", tipo, numMensagens, tamMsg);
-			//empacota e envia cada pedaco
-
-			int resto = tamMsg%DATA_SIZE;
-			for(i = 0; i < (tamMsg - resto); i++){
-				//copiando o maximo que da em comando
-				if(((i%DATA_SIZE) == 0) && (i != 0)){
-					strncpy(comando, aux, DATA_SIZE);
-					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
-					printf("%s\n", mensagem);
-					fflush(stdout);
-					write(soquete, comando, MSG_SIZE);
-					sequencia = aumentaSeq(sequencia);
-				}
-				aux[i%DATA_SIZE] = comando_salvo[i];
-			}
-			//empacotando o ultimo pacote
-			if(((i%DATA_SIZE) == 0) && (i != 0)){
-					strncpy(comando, aux, DATA_SIZE);
-					empacotaMsg(comando, mensagem, tipo, sequencia, DATA_SIZE);
-					printf("%s\n", mensagem);
-					fflush(stdout);
-					write(soquete, comando, MSG_SIZE);
-					sequencia = aumentaSeq(sequencia);
-			}
-			//empacota sobra
-			if(resto != 0){
-				for(i = resto-1; i >= 0; i--){
-					aux[i] = comando_salvo[tamMsg-resto+i];
-				}
-				strncpy(comando, aux, resto);
-				char msgResto[resto];
-				empacotaMsg(comando, msgResto, tipo, sequencia, resto);
-				printf("%s\n", msgResto);
-				fflush(stdout);
-				write(soquete, msgResto, MSG_SIZE);
-				sequencia = aumentaSeq(sequencia);
-			}
-
-			//TODO esperar resposta de acordo com o comando previamente enviado
-			//ls
-				//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
-			//cd
-				//basicamente nao faz nada
-			//put
-				//TODO se for um put, o mestre deve receber um ack e depois enviar os pacotes de dados
-			//get
-				//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
-			//ERRO
-				//TODO printar erro
-		}
-*/
