@@ -625,6 +625,17 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 				if(pedacos[1] == 1 && pedacos[2] == 0){
 					tamArq = tamArq - tam[1];
 					fwrite(data[1], tam[1], 1, fp);
+					//ACK no pedaco2
+					empacotaMsg("", msgStatus, ACK, seq[1], 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+					//anda janela 2 posicoes 
+					janelaInicio = janelaFim;
+					janelaFim = aumentaSeq(janelaInicio);
+					janelaFim = aumentaSeq(janelaFim);
+					pedacos[0] = pedacos[2];
+					seq[0] = seq[2];
+					pedacos[1] = 0;
+					pedacos[2] = 0;
 				}
 				//se pedaco 2 ja foi recebido E 3 ja foi recebido
 				else if(pedacos[1] == 1 && pedacos[2] == 1){
@@ -645,6 +656,20 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 					pedacos[1] = 0;
 					pedacos[2] = 0;
 				}
+				//se pedacos 2 e 3 nao foram recebidos, ACK pedaco 1
+				else{
+					//ACK no pedaco1
+					empacotaMsg("", msgStatus, ACK, seq[0], 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+					//anda janela 1 posicao 
+					janelaInicio = aumentaSeq(janelaInicio);
+					janelaFim = aumentaSeq(janelaFim);
+					pedacos[0] = pedacos[1];
+					pedacos[1] = pedacos[2];
+					seq[0] = seq[1];
+					seq[1] = seq[2];
+					pedacos[2] = 0;					
+				}
 			}			
 			//se pedaco 2
 			else if(seqRec == aumentaSeq(janelaInicio)){
@@ -659,6 +684,17 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 					//escreve no arquivo pedaco2
 					tamArq = tamArq - tam[1];		
 					fwrite(data[1], tam[1], 1, fp); 
+					//ACK no pedaco2
+					empacotaMsg("", msgStatus, ACK, seq[1], 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+					//anda janela 2 posicoes 
+					janelaInicio = janelaFim;
+					janelaFim = aumentaSeq(janelaInicio);
+					janelaFim = aumentaSeq(janelaFim);
+					pedacos[0] = pedacos[2];
+					seq[0] = seq[2];
+					pedacos[1] = 0;
+					pedacos[2] = 0;
 				}	
 				//se pedaco 2, e 1 e 3 foram recebidos
 				else if(pedacos[0] == 1 && pedacos[2] == 1){
