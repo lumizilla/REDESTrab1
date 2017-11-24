@@ -167,7 +167,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
-				/*printf("%s\n", dataRec);
+				printf("%s\n", dataRec);
 				fflush(stdout);
 				if(strcmp(dataRec, NAO_EXISTE) == 0){
 					printf("ERRO NO SERVIDOR: Diretorio nao existe.\n");
@@ -175,14 +175,14 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 				else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
 					printf("ERRO NO SERVIDOR: Permissao negada.\n");
 				}
-				return;*/
+				return;
 			}
 		}
 	}
 }
 
 int main(){
-  printf("\niniciando programa mestre(cliente)!\n");
+  	printf("\niniciando programa mestre(cliente)!\n");
 	int soquete = ConexaoRawSocket("eno1");
 	//int soquete = ConexaoRawSocket("enp3s0");
 	//comando(ou pedaco de comando) a ser enviado, empacotado
@@ -314,7 +314,7 @@ int main(){
 					//ls
 					case 7:
 						//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
-						trataCD(msgResto, sequencia-1, tamMsg, soquete);
+						trataLS(msgResto, sequencia-1, tamMsg, soquete);
 						break;
 					//cd
 					case 6:
