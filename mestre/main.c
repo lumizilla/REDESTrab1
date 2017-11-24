@@ -156,7 +156,8 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 
 		if(seqRec == seqMsg) {
 			if(tipo == MOSTRA){
-				//mostrar na tela o ls);
+				printf("asdasdsadsad%s\n", msgRec);
+				fflush(stdout);
 				return;
 			}
 			//se NACK, reenvia msg
@@ -252,7 +253,7 @@ int main(){
 		if(strcmp(subs[0],"lcd") != 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0],"rcd") != 0 && strcmp(subs[0],"rls") != 0 && strcmp(subs[0],"get") != 0 && strcmp(subs[0],"put") != 0){
 			printf("ERRO: comando invalido\n");
 		}
-		else if(strcmp(subs[1], "") == 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0], "lcd") != 0){
+		else if(strcmp(subs[1], "") == 0 && strcmp(subs[0], "lls") != 0 && strcmp(subs[0], "lcd") != 0 && strcmp(subs[0], "rls") != 0){
 			printf("ERRO: comando invalido, lcd, rcd, put e get necessitam de mais argumentos.\n");
 		}
 		//checa se arquivo existe antes de enviar
