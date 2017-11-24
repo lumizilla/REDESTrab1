@@ -1,8 +1,8 @@
 #include "../utils.c"
 
 int main(){
-        printf("\niniciando programa escravo(servidor)!\n");
-        int soquete = ConexaoRawSocket("eno1");
+  printf("\niniciando programa escravo(servidor)!\n");
+  int soquete = ConexaoRawSocket("eno1");
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 	//numero de sequencia da mensagem a ser enviada
@@ -30,8 +30,8 @@ int main(){
 		//desempacota mensagem
 		strcpy(dataRec, "");
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		dataRec[tamRec] = 0x00; 
-		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere, 
+		dataRec[tamRec] = 0x00;
+		//se retornou 0, nao houve erro, se retornou -1 inicio nao confere,
 		//-2 paridade não confere.
 		//se inicio nao confere soh ignora a mensagem
 		//confere se paridade incorreta responder com NACK
@@ -40,7 +40,7 @@ int main(){
 			printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
 			unsigned char msgEnviar[MSG_SIZE];
 			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
-			write(soquete, msgEnviar, OVERLOAD_SIZE); 
+			write(soquete, msgEnviar, OVERLOAD_SIZE);
 			sequencia = aumentaSeq(sequencia);
 		}
 		//confere o tamanho da mensagem
@@ -53,7 +53,7 @@ int main(){
 					/*getting the first substring*/
 					input = strtok(dataRec, " \n");
 					/*walking trough the other substrings*/
-					i = 0;	
+					i = 0;
 					while(input != NULL){
 						subs[i] = input;
 						input = strtok(NULL, " \n");
@@ -64,7 +64,7 @@ int main(){
 					if(error == 0){
 						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
-						write(soquete, msgEnviar, OVERLOAD_SIZE); 
+						write(soquete, msgEnviar, OVERLOAD_SIZE);
 						apagaRelativos(subs[1]);
 						//se nao houve erro, guardar no diretorio corrente
 						//TODO para o ls, checar se da certo o ls de acordo com o cd
@@ -73,17 +73,17 @@ int main(){
 					//Se ERRO responde com o cod do erro
 					else{
 						unsigned char msgEnviar[MSG_SIZE];
-						if(error == EACCES){			
+						if(error == EACCES){
 							empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
 							printf("nao permitido %s\n", msgEnviar);
 							fflush(stdout);
-							write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
+							write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE);
 						}
 						else{
 							empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_EXISTE));
 							printf("nao existe %s\n", msgEnviar);
 							fflush(stdout);
-							write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE); 
+							write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE);
 						}
 					}
 					break;
@@ -99,7 +99,7 @@ int main(){
 					/*getting the first substring*/
 					input = strtok(dataRec, " \n");
 					/*walking trough the other substrings*/
-					i = 0;	
+					i = 0;
 					while(input != NULL){
 						subs[i] = input;
 						input = strtok(NULL, " \n");
@@ -112,13 +112,13 @@ int main(){
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
 						printf("pode escrever neste diretorio.\n");
 						fflush(stdout);
-						write(soquete, msgEnviar, OVERLOAD_SIZE); 
+						write(soquete, msgEnviar, OVERLOAD_SIZE);
 						//se foi um OK, recebe o tamanho do arquivo
 						while(true){
 							//recebe mensagem
 							int r = read(soquete, msgRec, MSG_SIZE);
 							//desempacota mensagem
-							strcpy(dataRec, "");	
+							strcpy(dataRec, "");
 							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 							//se inicio nao confere soh ignora a mensagem
 							//se paridade nao confere envia nack
@@ -127,17 +127,17 @@ int main(){
 								printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
 								unsigned char msgEnviar[MSG_SIZE];
 								empacotaMsg("", msgEnviar, NACK, seqRec, 0);
-								write(soquete, msgEnviar, OVERLOAD_SIZE); 
+								write(soquete, msgEnviar, OVERLOAD_SIZE);
 								sequencia = aumentaSeq(sequencia);
 							}
 							else if(status == 0){
 								if(checaMemoria("./", dataRec) == 0){
 									//se tem memoria suficiente, responde com ACK
 									empacotaMsg("", msgEnviar, OK, seqRec, 0);
-									dataRec[tamRec] = 0x00; 
+									dataRec[tamRec] = 0x00;
 									printf("tem espaco para escrever arq de tam: %s\n", dataRec);
 									fflush(stdout);
-									write(soquete, msgEnviar, OVERLOAD_SIZE); 
+									write(soquete, msgEnviar, OVERLOAD_SIZE);
 									recebeArquivo(subs[1], soquete, atoll(dataRec));
 								}
 								else{
@@ -145,7 +145,7 @@ int main(){
 									empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
 									printf("nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
 									fflush(stdout);
-									write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE); 
+									write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE);
 								}
 								break;
 							}
@@ -157,13 +157,12 @@ int main(){
 						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
 						printf("nao permitido: %s\n", msgEnviar);
 						fflush(stdout);
-						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE); 
+						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE);
 					}
 					break;
 				default:
 					printf("ERRO: o tipo de comando não confere\n");
 			}
-		}	
-	}	
+		}
+	}
 }
-
