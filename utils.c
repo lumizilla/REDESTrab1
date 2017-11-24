@@ -245,7 +245,7 @@ int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 
 int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	//TODO timeout nos dados
-	
+	printf("dentro de enviaarquivo\n");
 	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
@@ -262,6 +262,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	unsigned char mensagem[MSG_SIZE];
 	
 	//abre arquivo	
+	printf("abrindo arquivo p/leitura \n");
 	FILE *fp;
 	fp = fopen(arquivo, "r");
 	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para leitura\n",stderr); return -1;}
@@ -278,6 +279,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	char pedaco1[DATA_SIZE];
 	int resultado = fread(pedaco1, DATA_SIZE, 1, fp);
 	//TODO testar erros nos fread
+	printf("enviando primeiro pedaco\n");
 	empacotaMsg(pedaco1, mensagem, DADO, *seq, DATA_SIZE);
 	*seq = aumentaSeq(*seq);
 	write(soquete, mensagem, MSG_SIZE); 
@@ -293,6 +295,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 			if(seqRec == janelaInicio){	
 				//aguarda OK
 				if(tipo == OK){
+					printf("recebi ack do primeiro pedaco\n");
 					aux = false;
 				}else if(tipo == NACK){
 					//se NACK, reenvia msg
@@ -467,6 +470,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	fclose (fp);
 
 	//envia fim
+	printf("OK: Enviei tudo, agora envio mensagem de FIM\n");
 	empacotaMsg("", mensagem, FIM, *seq, 0);
 	int seqFim = *seq;
 	*seq = aumentaSeq(*seq);
@@ -474,6 +478,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	while(true){	
 		//TODO testatimeouts
 		//recebe mensagem
+		printf("?: aguardo ACK do FIM\n");
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		//se nao houve erro de paridade e nem de inicio

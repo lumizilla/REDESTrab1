@@ -105,6 +105,8 @@ int main(){
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
+					char *nomeArq;
+					strcpy(nomeArq, subs[1]);
 					//checa se pode escrever neste diretorio
 					if(access("./", W_OK) == 0){
 						//Responde com OK
@@ -138,7 +140,7 @@ int main(){
 									printf("tem espaco para escrever arq de tam: %s\n", dataRec);
 									fflush(stdout);
 									write(soquete, msgEnviar, OVERLOAD_SIZE);
-									recebeArquivo(subs[1], soquete, atoll(dataRec));
+									recebeArquivo(nomeArq, soquete, atoll(dataRec));
 								}
 								else{
 									//se nao tem memoria suficiente, responde com ERRO
