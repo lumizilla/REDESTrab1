@@ -70,6 +70,7 @@ long long int checaMemoria(char *path, char* tam){
 }
 
 void apagaRelativos(char *caminho){
+	//TODO aqui ta dando segfault por algum motivo
 	char *subs[MAX_PATH];
 	/*getting the first substring*/
 	char *input = strtok(caminho, "/");	
@@ -583,7 +584,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 		//recebe pedaco
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		printf("recebi msg de sequencia - %hu", seqRec);
+		//printf("recebi msg de sequencia - %hu", seqRec);
 		//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
 		if(status == -2){
 			//TODO
