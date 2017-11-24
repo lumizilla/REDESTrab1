@@ -294,7 +294,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 			//se a sequencia corresponde
 			if(seqRec == janelaInicio){	
 				//aguarda OK
-				if(tipo == OK){
+				if(tipo == ACK){
 					printf("recebi ack do primeiro pedaco\n");
 					aux = false;
 				}else if(tipo == NACK){
@@ -304,34 +304,37 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 			}
 		}
 	}
-
-	//envia pedaco2
 	char pedaco2[DATA_SIZE];
-	resultado = fread(pedaco2, DATA_SIZE, 1, fp);
-	//TODO testar erros nos fread
-	empacotaMsg(pedaco2, mensagem, DADO, *seq, DATA_SIZE);
-	*seq = aumentaSeq(*seq);
-	write(soquete, mensagem, MSG_SIZE); 
-
-	//envia pedaco3
+	if(!feof(fp)){
+		//envia pedaco2
+		resultado = fread(pedaco2, DATA_SIZE, 1, fp);
+		//TODO testar erros nos fread
+		empacotaMsg(pedaco2, mensagem, DADO, *seq, DATA_SIZE);
+		*seq = aumentaSeq(*seq);
+		write(soquete, mensagem, MSG_SIZE); 
+	}
 	char pedaco3[DATA_SIZE];
-	resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-	//TODO testar erros nos fread
-	empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-	*seq = aumentaSeq(*seq);
-	write(soquete, mensagem, MSG_SIZE); 
-	
-	//anda janela 1 posicao pq na verdade ja li o ack do pedaco1
-	strcpy(pedaco1, pedaco2);
-	strcpy(pedaco2, pedaco3);
-	resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-	//TODO testar erros nos fread
-	empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-	*seq = aumentaSeq(*seq);
-	write(soquete, mensagem, MSG_SIZE); 
-	janelaInicio = aumentaSeq(janelaInicio);
-	janelaFim = aumentaSeq(janelaFim);
-
+	if(!feof(fp)){
+		//envia pedaco3
+		resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+		//TODO testar erros nos fread
+		empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+		*seq = aumentaSeq(*seq);
+		write(soquete, mensagem, MSG_SIZE); 
+	}
+	if(!feof(fp)){
+		//anda janela 1 posicao pq na verdade ja li o ack do pedaco1
+		strcpy(pedaco1, pedaco2);
+		strcpy(pedaco2, pedaco3);
+		resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+		//TODO testar erros nos fread
+		empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+		*seq = aumentaSeq(*seq);
+		write(soquete, mensagem, MSG_SIZE); 
+		janelaInicio = aumentaSeq(janelaInicio);
+		janelaFim = aumentaSeq(janelaFim);
+		printf("janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
+	}
 	//enquanto nao tiver enviado tudo
 	while(!feof(fp)){
 		//recebe mensagem
@@ -352,6 +355,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
 					janelaFim = aumentaSeq(janelaFim);
+					printf("recebi ack pedaco1, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 				}
 				//se mensagem = ACK pedaco2
 				else if(seqRec == aumentaSeq(janelaInicio)){
@@ -366,16 +370,19 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
 					janelaFim = aumentaSeq(janelaFim);
-					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
-					strcpy(pedaco1, pedaco2);
-					strcpy(pedaco2, pedaco3);
-					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-					*seq = aumentaSeq(*seq);
-					write(soquete, mensagem, MSG_SIZE); 
-					janelaInicio = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
+					if(!feof(fp)){
+						//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+						strcpy(pedaco1, pedaco2);
+						strcpy(pedaco2, pedaco3);
+						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+						//TODO testar erros nos fread
+						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						*seq = aumentaSeq(*seq);
+						write(soquete, mensagem, MSG_SIZE); 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+					}
+					printf("recebi ack pedaco2, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 				}
 				//se mensagem = ACK pedaco3
 				else if(seqRec == janelaFim){
@@ -390,26 +397,31 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
 					janelaFim = aumentaSeq(janelaFim);
-					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
-					strcpy(pedaco1, pedaco2);
-					strcpy(pedaco2, pedaco3);
-					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-					*seq = aumentaSeq(*seq);
-					write(soquete, mensagem, MSG_SIZE); 
-					janelaInicio = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
-					strcpy(pedaco1, pedaco2);
-					strcpy(pedaco2, pedaco3);
-					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-					*seq = aumentaSeq(*seq);
-					write(soquete, mensagem, MSG_SIZE); 
-					janelaInicio = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
+					if(!feof(fp)){
+						//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+						strcpy(pedaco1, pedaco2);
+						strcpy(pedaco2, pedaco3);
+						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+						//TODO testar erros nos fread
+						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						*seq = aumentaSeq(*seq);
+						write(soquete, mensagem, MSG_SIZE); 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+					}
+					if(!feof(fp)){
+						//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+						strcpy(pedaco1, pedaco2);
+						strcpy(pedaco2, pedaco3);
+						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+						//TODO testar erros nos fread
+						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						*seq = aumentaSeq(*seq);
+						write(soquete, mensagem, MSG_SIZE); 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						printf("recebi ack pedaco3, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
+					}
 				}
 			}
 			else if(tipo == NACK){
@@ -451,16 +463,18 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
 					janelaFim = aumentaSeq(janelaFim);
-					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
-					strcpy(pedaco1, pedaco2);
-					strcpy(pedaco2, pedaco3);
-					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
-					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
-					*seq = aumentaSeq(*seq);
-					write(soquete, mensagem, MSG_SIZE); 
-					janelaInicio = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
+					if(!feof(fp)){
+						//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
+						strcpy(pedaco1, pedaco2);
+						strcpy(pedaco2, pedaco3);
+						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
+						//TODO testar erros nos fread
+						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						*seq = aumentaSeq(*seq);
+						write(soquete, mensagem, MSG_SIZE); 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+					}
 				}
 			}
 		}
@@ -478,7 +492,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	while(true){	
 		//TODO testatimeouts
 		//recebe mensagem
-		printf("?: aguardo ACK do FIM\n");
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		//se nao houve erro de paridade e nem de inicio
@@ -487,6 +500,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 			if(seqRec == seqFim){	
 				//aguarda OK
 				if(tipo == OK){
+					printf("OK: recebi ACK do FIM\n");
 					return 0;
 				}else if(tipo == NACK){
 					//se NACK, reenvia msg
@@ -702,10 +716,10 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 				empacotaMsg("", msgStatus, ACK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
 			}		
-			//se msg == FIM, envia ACK
+			//se msg == FIM, envia OK
 			else if(tipo == FIM){
-				//envia ACK
-				empacotaMsg("", msgStatus, ACK, seqRec, 0);
+				//envia OK
+				empacotaMsg("", msgStatus, OK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
 				fclose(fp);	
 				return 0;	
