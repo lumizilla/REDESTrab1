@@ -39,6 +39,9 @@
 //tamanho maximo do nome de um diretorio com a /
 #define MAX_DIR 31
 
+//tamanho maximo para nome de um arquivo a ser enviado
+#define FILE_NAME 50
+
 //tipos das mensagens
 #define ACK 0
 #define TAM 2

@@ -105,7 +105,7 @@ int main(){
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
-					char *nomeArq;
+					char nomeArq[FILE_NAME];
 					strcpy(nomeArq, subs[1]);
 					//checa se pode escrever neste diretorio
 					if(access("./", W_OK) == 0){
