@@ -21,6 +21,8 @@ int main(){
 	char *subs[3];
 	//guarda o PATH do diretorio corrente
 	char path[MAX_INPUT] = "./";
+	//apenas para guardar comandos locais
+	char localCommand[DATA_SIZE];
 
 	//auxiliares
 	int i;
@@ -89,7 +91,55 @@ int main(){
 					}
 					break;
 				case 7: //ls
-					//TODO Realiza o comando ls, responde com ACK, Envia dados vindos do ls
+					printf("Recebi um ls: %s\n", dataRec);
+                    fflush(stdout);
+                    int errorLS = 0;
+                    char bufferLS[DATA_SIZE];
+                    char resultadoLS[DATA_SIZE];
+                    strcpy(bufferLS, "");
+                    strcpy(resultadoLS, "");
+                    
+                    //aqui eu guardo cada opção do ls em subs[1] em diante
+					input = strtok(dataRec, " \n");
+					i = 0;
+					while(input != NULL){
+						subs[i] = input;
+						input = strtok(NULL, " \n");
+						i = i+1;
+					}
+
+                    //numeroOpcoes guarda a quantidade de argumentos em subs
+		            int numeroOpcoes = i;
+
+                    //aqui eu concateno o "ls" com as opções que estão guardadas em subs[1] em diante e armazeno em localCommand
+                    strcpy(localCommand, "ls");
+                    for(int i = 1; i < numeroOpcoes; i++){
+	                    strcat(localCommand, " ");
+	                    strcat(localCommand, subs[i]);
+                    }
+                    strcat(localCommand, "\n");
+
+			        //executa o ls e salva o resultado em resultadoLS
+			        FILE *lsofFile_p = popen(localCommand, "r");
+                    if (!lsofFile_p) {
+                        errorLS = 1;
+                    }
+
+                    while (!feof(lsofFile_p)) {
+                        if (fgets(bufferLS, sizeof(bufferLS), lsofFile_p) != NULL) {
+                            strcat(resultadoLS, bufferLS);
+                        }
+                    }
+                    pclose(lsofFile_p);
+					printf("resultadoLS: %s\n", resultadoLS);
+                    fflush(stdout);
+                    //responde com MOSTRA, enviando o resultado do ls
+					if(errorLS == 0){
+						unsigned char msgEnviar[MSG_SIZE];
+						empacotaMsg(resultadoLS, msgEnviar, MOSTRA, seqRec, 0);
+						write(soquete, msgEnviar, OVERLOAD_SIZE);
+					}
+
 					break;
 				case 8: //get
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
