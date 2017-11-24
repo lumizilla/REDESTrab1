@@ -557,7 +557,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 
 		//se nao houve erro de paridade e nem de inicio	
 		if(status == 0 && tipo == DADO){
-			printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
+			//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
 			janelaInicio = seqRec;
 			//envia ACK
 			empacotaMsg("", msgStatus, ACK, seqRec, 0);
@@ -570,7 +570,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 		}
 		else if(status == -2){
 			//envia NACK
-			printf("recebi primeiro pedaco mas estou enviando NACK\n");
+			//printf("recebi primeiro pedaco mas estou enviando NACK\n");
 			empacotaMsg("", msgStatus, NACK, seqRec, 0);
 			write(soquete, msgStatus, OVERLOAD_SIZE); 
 		}
@@ -580,7 +580,6 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 	printf("tam arquivo %lld\n", tamArq);
 	//enquanto nao tiver recebido todos os pedacos
 	while(tamArq > 0){
-		printf("dentro do while -");
 		//recebe pedaco
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
@@ -601,6 +600,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 					//marca pedaco3 com nack e espera pedaco1 e 2
 		}
 		else if(status == 0){
+			//printf("recebi mensagem de seq: %hu, janela inicio=%d, janela fim =%d\n", seqRec, janelaInicio, janelaFim);
 			//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
 			//envia ACK dela
 			if(seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio)))){

@@ -28,7 +28,7 @@
 #define OVERLOAD_SIZE 4 
 
 //tamanho maximo do numero de sequencia
-#define SEQ_MAX 200
+#define SEQ_MAX 30
 
 //tamanho maximo do comando de input do mestre
 #define MAX_INPUT 200
