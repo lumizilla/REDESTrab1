@@ -70,6 +70,7 @@ long long int checaMemoria(char *path, char* tam){
 }
 
 void apagaRelativos(char *caminho){
+	//TODO aqui ta dando segfault por algum motivo
 	char *subs[MAX_PATH];
 	/*getting the first substring*/
 	char *input = strtok(caminho, "/");	
