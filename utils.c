@@ -721,12 +721,8 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 			}		
 			//se msg == FIM, envia OK
 			else if(tipo == FIM){
-<<<<<<< HEAD
 				printf("recebi fim \n");	
-				//envia ACK
-=======
 				//envia OK
->>>>>>> df236b6722af714f56cacc49868c99cd40032e35
 				empacotaMsg("", msgStatus, OK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
 				fclose(fp);	
