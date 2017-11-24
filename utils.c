@@ -583,6 +583,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 		//recebe pedaco
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		printf("recebi msg de sequencia - %hu", seqRec);
 		//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
 		if(status == -2){
 			//TODO
