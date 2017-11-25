@@ -246,7 +246,7 @@ int desempacotaMsg(char *msg, char *data, short *seq, short *tam, short *tipo){
 	return 0;
 }
 
-int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
+int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, int TIPO){
 	//TODO timeout nos dados
 	printf("dentro de enviaarquivo\n");
 	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
@@ -283,7 +283,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 	int resultado = fread(pedaco1, DATA_SIZE, 1, fp);
 	//TODO testar erros nos fread
 	printf("enviando primeiro pedaco\n");
-	empacotaMsg(pedaco1, mensagem, DADO, *seq, DATA_SIZE);
+	empacotaMsg(pedaco1, mensagem, TIPO, *seq, DATA_SIZE);
 	*seq = aumentaSeq(*seq);
 	write(soquete, mensagem, MSG_SIZE); 
 	//aguada ACK desta mensagem antes de continuar
@@ -312,7 +312,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 		//envia pedaco2
 		resultado = fread(pedaco2, DATA_SIZE, 1, fp);
 		//TODO testar erros nos fread
-		empacotaMsg(pedaco2, mensagem, DADO, *seq, DATA_SIZE);
+		empacotaMsg(pedaco2, mensagem, TIPO, *seq, DATA_SIZE);
 		*seq = aumentaSeq(*seq);
 		write(soquete, mensagem, MSG_SIZE); 
 	}
@@ -321,7 +321,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 		//envia pedaco3
 		resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 		//TODO testar erros nos fread
-		empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+		empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 		*seq = aumentaSeq(*seq);
 		write(soquete, mensagem, MSG_SIZE); 
 	}
@@ -331,7 +331,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 		strcpy(pedaco2, pedaco3);
 		resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 		//TODO testar erros nos fread
-		empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+		empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 		*seq = aumentaSeq(*seq);
 		write(soquete, mensagem, MSG_SIZE); 
 		janelaInicio = aumentaSeq(janelaInicio);
@@ -353,7 +353,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					strcpy(pedaco2, pedaco3);
 					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					*seq = aumentaSeq(*seq);
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
@@ -368,7 +368,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					strcpy(pedaco2, pedaco3);
 					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					*seq = aumentaSeq(*seq);
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
@@ -379,7 +379,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 						strcpy(pedaco2, pedaco3);
 						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 						//TODO testar erros nos fread
-						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 						*seq = aumentaSeq(*seq);
 						write(soquete, mensagem, MSG_SIZE); 
 						janelaInicio = aumentaSeq(janelaInicio);
@@ -395,7 +395,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					strcpy(pedaco2, pedaco3);
 					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					*seq = aumentaSeq(*seq);
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
@@ -406,7 +406,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 						strcpy(pedaco2, pedaco3);
 						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 						//TODO testar erros nos fread
-						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 						*seq = aumentaSeq(*seq);
 						write(soquete, mensagem, MSG_SIZE); 
 						janelaInicio = aumentaSeq(janelaInicio);
@@ -418,7 +418,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 						strcpy(pedaco2, pedaco3);
 						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 						//TODO testar erros nos fread
-						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 						*seq = aumentaSeq(*seq);
 						write(soquete, mensagem, MSG_SIZE); 
 						janelaInicio = aumentaSeq(janelaInicio);
@@ -430,13 +430,13 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 			else if(tipo == NACK){
 				//se nack de pedaco1, reenviar pedaco, nao andar janela
 				if(seqRec == janelaInicio){
-					empacotaMsg(pedaco1, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco1, mensagem, TIPO, *seq, DATA_SIZE);
 					write(soquete, mensagem, MSG_SIZE); 
 				}
 				//se nack de pedaco2,
 				else if(seqRec == aumentaSeq(janelaInicio)){
 					//reenvia pedaco2
-					empacotaMsg(pedaco2, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco2, mensagem, TIPO, *seq, DATA_SIZE);
 					write(soquete, mensagem, MSG_SIZE); 
 					//anda janela 1 posicao
 					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
@@ -444,7 +444,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					strcpy(pedaco2, pedaco3);
 					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					*seq = aumentaSeq(*seq);
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
@@ -453,7 +453,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 				//se nack de pedaco3
 				else if(seqRec == janelaFim){
 					//reenvia pedaco3
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					write(soquete, mensagem, MSG_SIZE); 
 					//anda janela 2 posicoes
 					//(pedaco1 = pedaco2, pedaco2 = pedaco3, pedaco3 = envianovopedaco)
@@ -461,7 +461,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 					strcpy(pedaco2, pedaco3);
 					resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 					//TODO testar erros nos fread
-					empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+					empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 					*seq = aumentaSeq(*seq);
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
@@ -472,7 +472,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq){
 						strcpy(pedaco2, pedaco3);
 						resultado = fread(pedaco3, DATA_SIZE, 1, fp);
 						//TODO testar erros nos fread
-						empacotaMsg(pedaco3, mensagem, DADO, *seq, DATA_SIZE);
+						empacotaMsg(pedaco3, mensagem, TIPO, *seq, DATA_SIZE);
 						*seq = aumentaSeq(*seq);
 						write(soquete, mensagem, MSG_SIZE); 
 						janelaInicio = aumentaSeq(janelaInicio);
