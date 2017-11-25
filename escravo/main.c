@@ -41,7 +41,6 @@ int main(){
 			unsigned char msgEnviar[MSG_SIZE];
 			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 			write(soquete, msgEnviar, OVERLOAD_SIZE);
-			sequencia = aumentaSeq(sequencia);
 		}
 		//confere o tamanho da mensagem
 		//confere qual a sequencia da mensagem
@@ -72,7 +71,6 @@ int main(){
 					}
 					//Se ERRO responde com o cod do erro
 					else{
-						printf("segfault?\n");
 						unsigned char msgEnviar[MSG_SIZE];
 						if(error == EACCES){
 							empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
@@ -89,7 +87,56 @@ int main(){
 					}
 					break;
 				case 7: //ls
-					//TODO Realiza o comando ls, responde com ACK, Envia dados vindos do ls
+					printf("Recebi um ls: %s\n", dataRec);
+					fflush(stdout);
+					if(strcmp(dataRec[sizeof(dataRec)-1], "\n") == 0){
+						dataRec[sizeof(dataRec)-1] = "";
+					}
+					strcat(dataRec, " > ls.txt\n");
+					if(system(dataRec) == -1){
+						fprintf(fp, "ERRO: erro ao executar o comando %s\n", dataRec);
+					}
+					//TODO enviar TAM
+					//tamanho da mensagem(sem overload) a ser enviada
+					short tamEnv;
+					//mensagem de tamanho do aquivo fica salva aqui
+					unsigned char arqTam[DATA_SIZE];
+					long long int tam_arquivo = tamArquivo("ls.txt");
+					tamEnv = sprintf(arqTam, "%lld", tam_arquivo);
+					//mensagem empacotada de tamanho certo
+					char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
+					empacotaMsg(arqTam, msgEmpacotada, TAM, *seq, tamEnv);
+					printf("Enviando tamanho %s\n", arqTam);
+					fflush(stdout);
+					write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
+					*seq = aumentaSeq(*seq);
+					while(true){
+						//TODO fazer timeout do TAM como no T2
+						read(soquete, msgRec, MSG_SIZE);
+						int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+						//aguarda OK
+						if(tipo == OK){
+							//TODO Atualiza timeout
+							printf("OK para escrever, memoria suficiente.\n");
+							enviaArquivo("ls.txt", soquete, tamArq, sequencia);
+							//TODO deletar arquivo desta maquina
+							break;
+						}
+						//se NACK, reenvia msg
+						else if(tipo == NACK){
+							write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+							//TODO Atualiza timeout
+						}
+						//se ERRO, printa erro
+						else if(tipo == ERRO){
+							//unico erro que a mensagem de tam pode gerar eh de espaco
+							if(strcmp(dataRec, NAO_ESPACO)){
+								printf("ERRO NO CLIENTE: Espaço insuficiente.\n");
+							}
+							break;
+						}
+					}
+					system("rm ls.txt");
 					break;
 				case 8: //get
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
