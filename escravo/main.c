@@ -95,7 +95,7 @@ int main(){
                     fflush(stdout);
                     int errorLS = 0;
                     char bufferLS[DATA_SIZE];
-                    char resultadoLS[DATA_SIZE];
+                    unsigned char resultadoLS[DATA_SIZE];
                     strcpy(bufferLS, "");
                     strcpy(resultadoLS, "");
                     
@@ -131,14 +131,28 @@ int main(){
                         }
                     }
                     pclose(lsofFile_p);
-					printf("resultadoLS: %s\n", resultadoLS);
+					printf("Resultado ls: %s", resultadoLS);
                     fflush(stdout);
-                    //responde com MOSTRA, enviando o resultado do ls
+                    if (errorLS == 0) {
+                        unsigned char msgEnviar[MSG_SIZE];
+                        empacotaMsg(resultadoLS, msgEnviar, MOSTRA, seqRec, sizeof(resultadoLS));
+                        write(soquete, msgEnviar, sizeof(resultadoLS)+OVERLOAD_SIZE);
+                    }
+
+                    //salvando resultadoLS em arquivo tmp
+                    /*FILE *f;
+                    f = fopen("tmp", "w");
+                    if (f == NULL) {
+                        printf("Erro ao criar arquivo tmp");
+                    }
+                    fprintf(f,"%s", resultadoLS);
+                    fclose(f);
+
+                    long long int tam_arquivoLS = tamArquivo("tmp");
+                    //envia o arquivo com o resultado do ls
 					if(errorLS == 0){
-						unsigned char msgEnviar[MSG_SIZE];
-						empacotaMsg(resultadoLS, msgEnviar, MOSTRA, seqRec, 0);
-						write(soquete, msgEnviar, OVERLOAD_SIZE);
-					}
+						enviaArquivo("tmp", soquete, tam_arquivoLS, &seqRec);
+					}*/
 
 					break;
 				case 8: //get
