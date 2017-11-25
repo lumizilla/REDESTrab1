@@ -134,7 +134,72 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	}
 }
 
-void trataGET();
+void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
+	//mensagem recebida
+	unsigned char msgRec[MSG_SIZE];
+	//bits de DADOS da msg recebida
+	unsigned char dataRec[DATA_SIZE];
+	//numero de sequencia da mensagem recebida
+	short seqRec = 0;
+	//tamanho de DADOS da mensagem recebida
+	short tamRec = 0;
+	//tipo de mensagem a ser enviada/recebida
+	short tipo = 0;
+
+	unsigned char msgEnviar[MSG_SIZE];
+	while(true){
+		//TODO fazer timeout como no T2
+		read(soquete, msgRec, MSG_SIZE);
+		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+		if(seqRec == seqMsg && status == 0){
+			//aguarda OK
+			if(tipo == OK){
+				printf("OK: Servidor aceitou o get. Recebendo tamanho...\n");
+				while(true){
+					//recebe tamanho
+					read(soquete, msgRec, MSG_SIZE);
+					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+					if(tipo == TAM && status == 0){
+						printf("OK: Tamanho recebido com sucesso\n");
+						//checa se pode escrever arquivo deste tamanho
+						//se nao tem memoria suficiente, responde com ERRO
+						if(checaMemoria("./", dataRec) == 0){
+							empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
+							printf("ERRO: nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
+							fflush(stdout);
+							write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE);
+							return;
+						}else{
+							recebeArquivo(arquivo, soquete, atoll(dataRec), DADO);
+							return;
+						}
+					}
+					else if(tipo != TAM || statues == -2){
+						//responde com NACK
+						empacotaMsg("", msgEnviar, NACK, seqRec, 0);
+						write(soquete, msgEnviar, OVERLOAD_SIZE);
+					}
+				}
+			}
+			//se NACK, reenvia msg
+			else if(tipo == NACK){
+				write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+				//TODO Atualiza timeout
+			}
+			//se ERRO, printa erro
+			else if(tipo == ERRO){
+				printf("%s\n", dataRec);
+				fflush(stdout);
+				if(strcmp(dataRec, NAO_PERMITIDO) == 0){
+					printf("ERRO NO SERVIDOR: Permissao negada.\n");
+				}else if(strcmp(dataRec, NAO_EXISTE)){
+					printf("ERRO NO SERVIDOR: Arquivo nao existe.\n");
+				}
+				return;
+			}
+		}
+	}
+}
 
 void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 	//mensagem recebida
@@ -321,7 +386,6 @@ int main(){
 				switch(tipo){
 					//ls
 					case 7:
-						//TODO, se for um ls, o mestre deve aguardar pelos pacotes e printar o pacote na tela
 						trataLS(msgResto, sequencia-1, tamMsg, soquete);
 						break;
 					//cd
@@ -334,7 +398,7 @@ int main(){
 						break;
 					case 8:
 					//get
-					//TODO se for um get, o mestre deve recever corretamente os pacotes enviados pelo escravo
+						trataGET(msgResto, sequencia-1, tamMsg, soquete, subs[1]);
 						break;
 					default:
 						printf("ERRO: Tipo de mensagem nao esperado");

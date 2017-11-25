@@ -42,7 +42,6 @@ int main(){
 		if(status == -2){
 			//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
 			printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
-			unsigned char msgEnviar[MSG_SIZE];
 			empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 			write(soquete, msgEnviar, OVERLOAD_SIZE);
 		}
@@ -139,6 +138,43 @@ int main(){
 					break;
 				case 8: //get
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
+					printf("Recebi um put: %s\n", dataRec);
+					fflush(stdout);
+					/*getting the first substring*/
+					input = strtok(dataRec, " \n");
+					/*walking trough the other substrings*/
+					i = 0;
+					while(input != NULL){
+						subs[i] = input;
+						input = strtok(NULL, " \n");
+						i = i+1;
+					}
+					char nomeArq[FILE_NAME];
+					strcpy(nomeArq, subs[1]);
+					//checa se pode ler deste diretorio
+					if(access("./", R_OK) == 0){
+						//Responde com OK
+						if(access(subs[1], F_OK) != -1){
+							empacotaMsg("", msgEnviar, OK, seqRec, 0);
+							printf("pode ler o arquivo deste diretorio.\n");
+							fflush(stdout);
+							write(soquete, msgEnviar, OVERLOAD_SIZE);
+							//se foi um OK, envia o tamanho do arquivo
+							while(true){
+							
+							}
+						}else{
+							empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_EXISTE));
+							printf("nao existe: %s\n", subs[1]);
+							fflush(stdout);
+							write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE);
+						}
+					}else{
+						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
+						printf("nao permitido: %s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE);
+					}
 					break;
 				case 9: //put
 					printf("Recebi um put: %s\n", dataRec);
@@ -157,7 +193,6 @@ int main(){
 					//checa se pode escrever neste diretorio
 					if(access("./", W_OK) == 0){
 						//Responde com OK
-						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
 						printf("pode escrever neste diretorio.\n");
 						fflush(stdout);
@@ -174,7 +209,6 @@ int main(){
 							if(status == -2){
 								//empacota NACK, SEQ = NUMERO DE SEQ DA MENSAGEM RECEBIDA
 								printf("Mensagem recebida com paridade incoreta, enviando nack.\n");
-								unsigned char msgEnviar[MSG_SIZE];
 								empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 								write(soquete, msgEnviar, OVERLOAD_SIZE);
 								sequencia = aumentaSeq(sequencia);
@@ -202,7 +236,6 @@ int main(){
 					}
 					//ERRO(se nao tem permissao de escrita)
 					else{
-						unsigned char msgEnviar[MSG_SIZE];
 						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
 						printf("nao permitido: %s\n", msgEnviar);
 						fflush(stdout);
