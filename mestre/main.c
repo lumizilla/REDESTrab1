@@ -154,8 +154,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 		//TODO fazer timeout como no T2
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		if(seqRec == seqMsg) {
-			if(seqRec == seqMsg && status == 0){
+		if(seqRec == seqMsg && status == 0){
 			//aguarda OK
 			if(tipo == OK){
 				printf("OK: Servidor aceitou ls, aguardando TAM do ls.\n");
