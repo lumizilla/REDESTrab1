@@ -148,16 +148,28 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 
+	//msg de ACK/NACK/OK etc
+	unsigned char msgStatus[OVERLOAD_SIZE];
 	while (true) {
 		//TODO fazer timeout como no T2
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//TODO responde com NACK caso paridade nao bata
-
 		if(seqRec == seqMsg) {
-			if(tipo == MOSTRA){
-				//mostrar na tela o ls);
-				return;
+			if(seqRec == seqMsg && status == 0){
+			//aguarda OK
+			if(tipo == OK){
+				printf("OK: Servidor aceitou ls, aguardando TAM do ls.\n");
+				while(true){
+					read(soquete, msgRec, MSG_SIZE);
+					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+					if(tipo == TAM && status == 0){
+						empacotaMsg("", msgStatus, ACK, seqRec, 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE);
+						printf("Recebendo ls remoto...\n");
+						recebeArquivo("ls.txt, soquete, atoll(dataRec));
+						return;
+					}
+				}
 			}
 			//se NACK, reenvia msg
 			else if(tipo == NACK){
