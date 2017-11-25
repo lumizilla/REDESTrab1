@@ -166,6 +166,9 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 						write(soquete, msgStatus, OVERLOAD_SIZE);
 						printf("Recebendo ls remoto...\n");
 						recebeArquivo("ls.txt, soquete, atoll(dataRec));
+						system("cat ls.txt");
+						fflush(stdout);
+						remove("ls.txt");
 						return;
 					}
 				}
