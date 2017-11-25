@@ -148,35 +148,32 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 
-	while (true) {
-		//TODO fazer timeout como no T2
-		read(soquete, msgRec, MSG_SIZE);
-		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//TODO responde com NACK caso paridade nao bata
+    //TODO eu tenho que receber o arqivo aqui, é parecido com a parte do put no escravo eu acho
 
-		if(seqRec == seqMsg) {
-			if(tipo == MOSTRA){
-				printf("asdasdsadsad%s\n", msgRec);
-				fflush(stdout);
-				return;
+    read(soquete, msgRec, MSG_SIZE);
+	int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+	if(seqRec == seqMsg) {
+		if(tipo == MOSTRA){
+			printf("Resultado ls:\n%s\n", dataRec);
+			fflush(stdout);
+			return;
+		}
+		//se NACK, reenvia msg
+		else if(tipo == NACK){
+			write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
+			//TODO Atualiza timeout
+		}
+		//se ERRO, printa erro
+		else if(tipo == ERRO){
+			printf("%s\n", dataRec);
+			fflush(stdout);
+			if(strcmp(dataRec, NAO_EXISTE) == 0){
+				printf("ERRO NO SERVIDOR: Diretorio nao existe.\n");
 			}
-			//se NACK, reenvia msg
-			else if(tipo == NACK){
-				write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
-				//TODO Atualiza timeout
+			else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
+				printf("ERRO NO SERVIDOR: Permissao negada.\n");
 			}
-			//se ERRO, printa erro
-			else if(tipo == ERRO){
-				printf("%s\n", dataRec);
-				fflush(stdout);
-				if(strcmp(dataRec, NAO_EXISTE) == 0){
-					printf("ERRO NO SERVIDOR: Diretorio nao existe.\n");
-				}
-				else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
-					printf("ERRO NO SERVIDOR: Permissao negada.\n");
-				}
-				return;
-			}
+			return;
 		}
 	}
 }
