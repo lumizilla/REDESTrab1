@@ -515,7 +515,7 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 	return -1;
 }
 
-int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
+int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 	//TODO timeout
 
 	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
@@ -543,232 +543,456 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq){
 	unsigned char data[3][DATA_SIZE];
 	short seq[3];	
 	short tam[3];
+	
+	if(TIPO == DADO){
+		//abre novo arquivo com nome = arquivo	
+		//abre arquivo	
+		FILE *fp;
+		fp = fopen(arquivo, "w");
+		if (fp==NULL) {fputs ("ERRO ao abrir arquivo para escrita\n",stderr); return -1;}
 
-	//abre novo arquivo com nome = arquivo	
-	//abre arquivo	
-	FILE *fp;
-	fp = fopen(arquivo, "w");
-	if (fp==NULL) {fputs ("ERRO ao abrir arquivo para escrita\n",stderr); return -1;}
+		//recebe seq do primeiro pedaco recebido
+		int janelaInicio;
 
-	//recebe seq do primeiro pedaco recebido
-	int janelaInicio;
+		while(true){	
+			//recebe primeiro pedaco
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 
-	while(true){	
-		//recebe primeiro pedaco
-		read(soquete, msgRec, MSG_SIZE);
-		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-
-		//se nao houve erro de paridade e nem de inicio	
-		if(status == 0 && tipo == DADO){
-			//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
-			janelaInicio = seqRec;
-			//envia ACK
-			empacotaMsg("", msgStatus, ACK, seqRec, 0);
-			write(soquete, msgStatus, OVERLOAD_SIZE); 
-			//escreve no arquivo		
-			fwrite(dataRec, tamRec, 1, fp); 
-			janelaInicio = aumentaSeq(janelaInicio);
-			tamArq = tamArq - tamRec;
-			break;
-		}
-		else if(status == -2){
-			//envia NACK
-			//printf("recebi primeiro pedaco mas estou enviando NACK\n");
-			empacotaMsg("", msgStatus, NACK, seqRec, 0);
-			write(soquete, msgStatus, OVERLOAD_SIZE); 
-		}
-	}
-	int janelaFim = aumentaSeq(janelaInicio);
-	janelaFim = aumentaSeq(janelaFim);
-	printf("tam arquivo %lld\n", tamArq);
-	//enquanto nao tiver recebido todos os pedacos
-	while(tamArq > 0){
-		//recebe pedaco
-		read(soquete, msgRec, MSG_SIZE);
-		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		//printf("recebi msg de sequencia - %hu", seqRec);
-		//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
-		if(status == -2){
-			//TODO
-			//se pedaco1
-				//envia nack e nao anda janela
-			//se pedaco2
-				//se pedaco1 ja foi recebido
-					//envia nack do pedaco2 e anda janela 1 posicao
-				//se pedaco1 nao foi recebido
-					//marca pedaco2 com nack e espera pedaco1
-			//se pedaco3 
-				//se pedaco1 e 2 ja foram recebidos
-					//envia nack da 3 e anda janela 2 posicoes
-				//se pedaco1 ou 2 nao foram recebidos
-					//marca pedaco3 com nack e espera pedaco1 e 2
-		}
-		else if(status == 0){
-			//printf("recebi mensagem de seq: %hu, janela inicio=%d, janela fim =%d\n", seqRec, janelaInicio, janelaFim);
-			//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
-			//envia ACK dela
-			if(seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio)))){
+			//se nao houve erro de paridade e nem de inicio	
+			if(status == 0 && tipo == DADO){
+				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
+				janelaInicio = seqRec;
 				//envia ACK
 				empacotaMsg("", msgStatus, ACK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
-			}
-			//SE PEDACO ESTA DENTRO DA JANELA						
-			//se pedaco 1
-			else if(seqRec == janelaInicio){
-				//MANEJA PEDACO1
-				pedacos[0] = 1;
-				//salva dados
-				strcpy(data[0], dataRec);
-				seq[0] = seqRec;
-				tam[0] = tamRec;
 				//escreve no arquivo		
 				fwrite(dataRec, tamRec, 1, fp); 
+				janelaInicio = aumentaSeq(janelaInicio);
 				tamArq = tamArq - tamRec;
+				break;
+			}
+			else if(status == -2){
+				//envia NACK
+				//printf("recebi primeiro pedaco mas estou enviando NACK\n");
+				empacotaMsg("", msgStatus, NACK, seqRec, 0);
+				write(soquete, msgStatus, OVERLOAD_SIZE); 
+			}
+		}
+		int janelaFim = aumentaSeq(janelaInicio);
+		janelaFim = aumentaSeq(janelaFim);
+		printf("tam arquivo %lld\n", tamArq);
+		//enquanto nao tiver recebido todos os pedacos
+		while(tamArq > 0){
+			//recebe pedaco
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			//printf("recebi msg de sequencia - %hu", seqRec);
+			//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
+			if(status == -2){
+				//TODO
+				//se pedaco1
+					//envia nack e nao anda janela
+				//se pedaco2
+					//se pedaco1 ja foi recebido
+						//envia nack do pedaco2 e anda janela 1 posicao
+					//se pedaco1 nao foi recebido
+						//marca pedaco2 com nack e espera pedaco1
+				//se pedaco3 
+					//se pedaco1 e 2 ja foram recebidos
+						//envia nack da 3 e anda janela 2 posicoes
+					//se pedaco1 ou 2 nao foram recebidos
+						//marca pedaco3 com nack e espera pedaco1 e 2
+			}
+			else if(status == 0){
+				//printf("recebi mensagem de seq: %hu, janela inicio=%d, janela fim =%d\n", seqRec, janelaInicio, janelaFim);
+				//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
+				//envia ACK dela
+				if(seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio)))){
+					//envia ACK
+					empacotaMsg("", msgStatus, ACK, seqRec, 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+				}
+				//SE PEDACO ESTA DENTRO DA JANELA						
+				//se pedaco 1
+				else if(seqRec == janelaInicio){
+					//MANEJA PEDACO1
+					pedacos[0] = 1;
+					//salva dados
+					strcpy(data[0], dataRec);
+					seq[0] = seqRec;
+					tam[0] = tamRec;
+					//escreve no arquivo		
+					fwrite(dataRec, tamRec, 1, fp); 
+					tamArq = tamArq - tamRec;
 
-				//se pedaco 2 ja foi recebido E 3 nao foi
-				if(pedacos[1] == 1 && pedacos[2] == 0){
-					tamArq = tamArq - tam[1];
-					fwrite(data[1], tam[1], 1, fp);
-					//ACK no pedaco2
-					empacotaMsg("", msgStatus, ACK, seq[1], 0);
+					//se pedaco 2 ja foi recebido E 3 nao foi
+					if(pedacos[1] == 1 && pedacos[2] == 0){
+						tamArq = tamArq - tam[1];
+						fwrite(data[1], tam[1], 1, fp);
+						//ACK no pedaco2
+						empacotaMsg("", msgStatus, ACK, seq[1], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 2 posicoes 
+						janelaInicio = janelaFim;
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[2];
+						seq[0] = seq[2];
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}
+					//se pedaco 2 ja foi recebido E 3 ja foi recebido
+					else if(pedacos[1] == 1 && pedacos[2] == 1){
+						//escreve no arquivo pedaco2	
+						tamArq = tamArq - tam[1];	
+						fwrite(data[1], tam[1], 1, fp); 
+						//escreve no arquivo pedaco3
+						tamArq = tamArq - tam[2];		
+						fwrite(data[2], tam[2], 1, fp); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}
+					//se pedacos 2 e 3 nao foram recebidos, ACK pedaco 1
+					else{
+						//ACK no pedaco1
+						empacotaMsg("", msgStatus, ACK, seq[0], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 1 posicao 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[1];
+						pedacos[1] = pedacos[2];
+						seq[0] = seq[1];
+						seq[1] = seq[2];
+						pedacos[2] = 0;					
+					}
+				}			
+				//se pedaco 2
+				else if(seqRec == aumentaSeq(janelaInicio)){
+					//MANEJA PEDACO2
+					pedacos[1] = 1;
+					//salva dados
+					strcpy(data[1], dataRec);
+					seq[1] = seqRec;
+					tam[1] = tamRec;
+					//se pedaco 2, e 1 foi recebido e 3 nao foi 
+					if(pedacos[2] == 0 && pedacos[0] == 1){
+						//escreve no arquivo pedaco2
+						tamArq = tamArq - tam[1];		
+						fwrite(data[1], tam[1], 1, fp); 
+						//ACK no pedaco2
+						empacotaMsg("", msgStatus, ACK, seq[1], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 2 posicoes 
+						janelaInicio = janelaFim;
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[2];
+						seq[0] = seq[2];
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+					//se pedaco 2, e 1 e 3 foram recebidos
+					else if(pedacos[0] == 1 && pedacos[2] == 1){
+						//escreve no arquivo pedaco2
+						tamArq = tamArq - tam[1];		
+						fwrite(data[1], tam[1], 1, fp); 
+						//escreve no arquivo pedaco3	
+						tamArq = tamArq - tam[2];	
+						fwrite(data[2], tam[2], 1, fp); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+				}				
+				//se pedaco 3
+				else if(seqRec == janelaFim){
+					//MANEJA PEDACO3
+					pedacos[2] = 1;
+					//salva dados
+					strcpy(data[2], dataRec);
+					seq[2] = seqRec;
+					tam[2] = tamRec;
+					//se pedaco 3, e 2 e 1 foram recebidos 
+					if(pedacos[0] == 1 && pedacos[1] == 1){
+						//escreve no arquivo pedaco3
+						tamArq = tamArq - tam[2];		
+						fwrite(data[2], tam[2], 1, fp); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+				}				
+			}
+		}
+		while(true){
+			//recebe msg
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			if(status == 0){
+				//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
+				//envia ACK dela
+				if(tipo == DADO && (seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio))))){
+					//envia ACK
+					empacotaMsg("", msgStatus, ACK, seqRec, 0);
 					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela 2 posicoes 
-					janelaInicio = janelaFim;
-					janelaFim = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = pedacos[2];
-					seq[0] = seq[2];
-					pedacos[1] = 0;
-					pedacos[2] = 0;
-				}
-				//se pedaco 2 ja foi recebido E 3 ja foi recebido
-				else if(pedacos[1] == 1 && pedacos[2] == 1){
-					//escreve no arquivo pedaco2	
-					tamArq = tamArq - tam[1];	
-					fwrite(data[1], tam[1], 1, fp); 
-					//escreve no arquivo pedaco3
-					tamArq = tamArq - tam[2];		
-					fwrite(data[2], tam[2], 1, fp); 
-					//ACK NO PEDACO 3
-					empacotaMsg("", msgStatus, ACK, seq[2], 0);
+				}		
+				//se msg == FIM, envia OK
+				else if(tipo == FIM){
+					printf("recebi fim \n");	
+					//envia OK
+					empacotaMsg("", msgStatus, OK, seqRec, 0);
 					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela
-					janelaInicio = aumentaSeq(janelaFim);
-					janelaFim = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = 0;
-					pedacos[1] = 0;
-					pedacos[2] = 0;
-				}
-				//se pedacos 2 e 3 nao foram recebidos, ACK pedaco 1
-				else{
-					//ACK no pedaco1
-					empacotaMsg("", msgStatus, ACK, seq[0], 0);
-					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela 1 posicao 
-					janelaInicio = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = pedacos[1];
-					pedacos[1] = pedacos[2];
-					seq[0] = seq[1];
-					seq[1] = seq[2];
-					pedacos[2] = 0;					
-				}
-			}			
-			//se pedaco 2
-			else if(seqRec == aumentaSeq(janelaInicio)){
-				//MANEJA PEDACO2
-				pedacos[1] = 1;
-				//salva dados
-				strcpy(data[1], dataRec);
-				seq[1] = seqRec;
-				tam[1] = tamRec;
-				//se pedaco 2, e 1 foi recebido e 3 nao foi 
-				if(pedacos[2] == 0 && pedacos[0] == 1){
-					//escreve no arquivo pedaco2
-					tamArq = tamArq - tam[1];		
-					fwrite(data[1], tam[1], 1, fp); 
-					//ACK no pedaco2
-					empacotaMsg("", msgStatus, ACK, seq[1], 0);
-					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela 2 posicoes 
-					janelaInicio = janelaFim;
-					janelaFim = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = pedacos[2];
-					seq[0] = seq[2];
-					pedacos[1] = 0;
-					pedacos[2] = 0;
-				}	
-				//se pedaco 2, e 1 e 3 foram recebidos
-				else if(pedacos[0] == 1 && pedacos[2] == 1){
-					//escreve no arquivo pedaco2
-					tamArq = tamArq - tam[1];		
-					fwrite(data[1], tam[1], 1, fp); 
-					//escreve no arquivo pedaco3	
-					tamArq = tamArq - tam[2];	
-					fwrite(data[2], tam[2], 1, fp); 
-					//ACK NO PEDACO 3
-					empacotaMsg("", msgStatus, ACK, seq[2], 0);
-					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela
-					janelaInicio = aumentaSeq(janelaFim);
-					janelaFim = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = 0;
-					pedacos[1] = 0;
-					pedacos[2] = 0;
-				}	
-			}				
-			//se pedaco 3
-			else if(seqRec == janelaFim){
-				//MANEJA PEDACO3
-				pedacos[2] = 1;
-				//salva dados
-				strcpy(data[2], dataRec);
-				seq[2] = seqRec;
-				tam[2] = tamRec;
-				//se pedaco 3, e 2 e 1 foram recebidos 
-				if(pedacos[0] == 1 && pedacos[1] == 1){
-					//escreve no arquivo pedaco3
-					tamArq = tamArq - tam[2];		
-					fwrite(data[2], tam[2], 1, fp); 
-					//ACK NO PEDACO 3
-					empacotaMsg("", msgStatus, ACK, seq[2], 0);
-					write(soquete, msgStatus, OVERLOAD_SIZE); 
-					//anda janela
-					janelaInicio = aumentaSeq(janelaFim);
-					janelaFim = aumentaSeq(janelaInicio);
-					janelaFim = aumentaSeq(janelaFim);
-					pedacos[0] = 0;
-					pedacos[1] = 0;
-					pedacos[2] = 0;
-				}	
-			}				
+					fclose(fp);	
+					return 0;	
+				}		
+			}
 		}
 	}
-	while(true){
-		//recebe msg
-		read(soquete, msgRec, MSG_SIZE);
-		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-		if(status == 0){
-			//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
-			//envia ACK dela
-			if(tipo == DADO && (seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio))))){
+	else if(TIPO == MOSTRA){
+		//recebe seq do primeiro pedaco recebido
+		int janelaInicio;
+
+		while(true){	
+			//recebe primeiro pedaco
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+
+			//se nao houve erro de paridade e nem de inicio	
+			if(status == 0 && tipo == MOSTRA){
+				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
+				janelaInicio = seqRec;
 				//envia ACK
 				empacotaMsg("", msgStatus, ACK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
-			}		
-			//se msg == FIM, envia OK
-			else if(tipo == FIM){
-				printf("recebi fim \n");	
-				//envia OK
-				empacotaMsg("", msgStatus, OK, seqRec, 0);
+				//escreve no arquivo		
+				printf("%s", dataRec); 
+				janelaInicio = aumentaSeq(janelaInicio);
+				tamArq = tamArq - tamRec;
+				break;
+			}
+			else if(status == -2){
+				//envia NACK
+				//printf("recebi primeiro pedaco mas estou enviando NACK\n");
+				empacotaMsg("", msgStatus, NACK, seqRec, 0);
 				write(soquete, msgStatus, OVERLOAD_SIZE); 
-				fclose(fp);	
-				return 0;	
-			}		
+			}
+		}
+		int janelaFim = aumentaSeq(janelaInicio);
+		janelaFim = aumentaSeq(janelaFim);
+		printf("tam arquivo %lld\n", tamArq);
+		//enquanto nao tiver recebido todos os pedacos
+		while(tamArq > 0){
+			//recebe pedaco
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			//printf("recebi msg de sequencia - %hu", seqRec);
+			//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
+			if(status == -2){
+				//TODO
+				//se pedaco1
+					//envia nack e nao anda janela
+				//se pedaco2
+					//se pedaco1 ja foi recebido
+						//envia nack do pedaco2 e anda janela 1 posicao
+					//se pedaco1 nao foi recebido
+						//marca pedaco2 com nack e espera pedaco1
+				//se pedaco3 
+					//se pedaco1 e 2 ja foram recebidos
+						//envia nack da 3 e anda janela 2 posicoes
+					//se pedaco1 ou 2 nao foram recebidos
+						//marca pedaco3 com nack e espera pedaco1 e 2
+			}
+			else if(status == 0){
+				//printf("recebi mensagem de seq: %hu, janela inicio=%d, janela fim =%d\n", seqRec, janelaInicio, janelaFim);
+				//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
+				//envia ACK dela
+				if(seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio)))){
+					//envia ACK
+					empacotaMsg("", msgStatus, ACK, seqRec, 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+				}
+				//SE PEDACO ESTA DENTRO DA JANELA						
+				//se pedaco 1
+				else if(seqRec == janelaInicio){
+					//MANEJA PEDACO1
+					pedacos[0] = 1;
+					//salva dados
+					strcpy(data[0], dataRec);
+					seq[0] = seqRec;
+					tam[0] = tamRec;
+					//escreve no arquivo		
+					printf("%s", dataRec); 
+					tamArq = tamArq - tamRec;
+
+					//se pedaco 2 ja foi recebido E 3 nao foi
+					if(pedacos[1] == 1 && pedacos[2] == 0){
+						tamArq = tamArq - tam[1];
+						printf("%s", data[1]); 
+						//ACK no pedaco2
+						empacotaMsg("", msgStatus, ACK, seq[1], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 2 posicoes 
+						janelaInicio = janelaFim;
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[2];
+						seq[0] = seq[2];
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}
+					//se pedaco 2 ja foi recebido E 3 ja foi recebido
+					else if(pedacos[1] == 1 && pedacos[2] == 1){
+						//escreve no arquivo pedaco2	
+						tamArq = tamArq - tam[1];	
+						printf("%s", data[1]); 
+						//escreve no arquivo pedaco3
+						tamArq = tamArq - tam[2];		
+						printf("%s", data[2]); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}
+					//se pedacos 2 e 3 nao foram recebidos, ACK pedaco 1
+					else{
+						//ACK no pedaco1
+						empacotaMsg("", msgStatus, ACK, seq[0], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 1 posicao 
+						janelaInicio = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[1];
+						pedacos[1] = pedacos[2];
+						seq[0] = seq[1];
+						seq[1] = seq[2];
+						pedacos[2] = 0;					
+					}
+				}			
+				//se pedaco 2
+				else if(seqRec == aumentaSeq(janelaInicio)){
+					//MANEJA PEDACO2
+					pedacos[1] = 1;
+					//salva dados
+					strcpy(data[1], dataRec);
+					seq[1] = seqRec;
+					tam[1] = tamRec;
+					//se pedaco 2, e 1 foi recebido e 3 nao foi 
+					if(pedacos[2] == 0 && pedacos[0] == 1){
+						//escreve no arquivo pedaco2
+						tamArq = tamArq - tam[1];		
+						printf("%s", data[1]); 
+						//ACK no pedaco2
+						empacotaMsg("", msgStatus, ACK, seq[1], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela 2 posicoes 
+						janelaInicio = janelaFim;
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = pedacos[2];
+						seq[0] = seq[2];
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+					//se pedaco 2, e 1 e 3 foram recebidos
+					else if(pedacos[0] == 1 && pedacos[2] == 1){
+						//escreve no arquivo pedaco2
+						tamArq = tamArq - tam[1];		
+						printf("%s", data[1]); 
+						//escreve no arquivo pedaco3	
+						tamArq = tamArq - tam[2];	
+						printf("%s", data[2]); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+				}				
+				//se pedaco 3
+				else if(seqRec == janelaFim){
+					//MANEJA PEDACO3
+					pedacos[2] = 1;
+					//salva dados
+					strcpy(data[2],	 dataRec);
+					seq[2] = seqRec;
+					tam[2] = tamRec;
+					//se pedaco 3, e 2 e 1 foram recebidos 
+					if(pedacos[0] == 1 && pedacos[1] == 1){
+						//escreve no arquivo pedaco3
+						tamArq = tamArq - tam[2];		
+						printf("%s", data[2]); 
+						//ACK NO PEDACO 3
+						empacotaMsg("", msgStatus, ACK, seq[2], 0);
+						write(soquete, msgStatus, OVERLOAD_SIZE); 
+						//anda janela
+						janelaInicio = aumentaSeq(janelaFim);
+						janelaFim = aumentaSeq(janelaInicio);
+						janelaFim = aumentaSeq(janelaFim);
+						pedacos[0] = 0;
+						pedacos[1] = 0;
+						pedacos[2] = 0;
+					}	
+				}				
+			}
+		}
+		while(true){
+			//recebe msg
+			read(soquete, msgRec, MSG_SIZE);
+			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			if(status == 0){
+				//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
+				//envia ACK dela
+				if(tipo == DADO && (seqRec == diminuiSeq(janelaInicio) || seqRec == diminuiSeq(diminuiSeq(janelaInicio)) || seqRec == diminuiSeq(diminuiSeq(diminuiSeq(janelaInicio))))){			
+			//envia ACK
+					empacotaMsg("", msgStatus, ACK, seqRec, 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+				}		
+				//se msg == FIM, envia OK
+				else if(tipo == FIM){
+					printf("recebi fim \n");	
+					//envia OK
+					empacotaMsg("", msgStatus, OK, seqRec, 0);
+					write(soquete, msgStatus, OVERLOAD_SIZE); 
+					return 0;	
+				}		
+			}
 		}
 	}
+	
 	return -1;
 }
