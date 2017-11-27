@@ -250,6 +250,9 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 			else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
 				printf("ERRO NO SERVIDOR: Permissao negada.\n");
 			}
+			else if(strcmp(dataRec, NAO_EXISTE) == 0){
+				printf("ERRO NO SERVIDOR: Arquivo nao existe.\n");
+			}
 			return;
 		}
 	}

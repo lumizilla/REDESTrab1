@@ -777,7 +777,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 			read(soquete, msgRec, MSG_SIZE);
 			strcpy(dataRec, "");
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-			dataRec[sizeof(dataRec)] = 0x00;
+			dataRec[tamRec] = 0x00;
 			//se nao houve erro de paridade e nem de inicio	
 			if(status == 0 && tipo == MOSTRA){
 				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
@@ -806,7 +806,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 			read(soquete, msgRec, MSG_SIZE);
 			strcpy(dataRec, "");
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-			dataRec[sizeof(dataRec)] = 0x00;
+			dataRec[tamRec] = 0x00;
 			//printf("recebi msg de sequencia - %hu", seqRec);
 			//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
 			if(status == -2){
