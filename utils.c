@@ -426,7 +426,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 						janelaInicio = aumentaSeq(janelaInicio);
 						janelaFim = aumentaSeq(janelaFim);
 					}
-					printf("recebi ack pedaco2, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 				}
 				//se mensagem = ACK pedaco3
 				else if(seqRec == janelaFim){
@@ -464,7 +463,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 						write(soquete, mensagem, MSG_SIZE); 
 						janelaInicio = aumentaSeq(janelaInicio);
 						janelaFim = aumentaSeq(janelaFim);
-						printf("recebi ack pedaco3, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 					}
 				}
 			}
