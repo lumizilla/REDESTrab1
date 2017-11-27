@@ -113,13 +113,20 @@ int main(){
 					FILE *fp;
 					fp = fopen("ls.txt", "w");
 					strcat(dataRec, " > ls.txt\n");
-					if(system(dataRec) == -1){
-						fprintf(fp, "ERRO: erro ao executar o comando %s\n", dataRec);
+					int result = system(dataRec);
+					if(result == -1){
 						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
 						printf("nao permitido: %s\n", msgEnviar);
 						fflush(stdout);
 						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE);					
-					}else{
+					}else if(result == 512){
+						empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
+						printf("nao existe: %s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, sizeof(NAO_EXISTE)+OVERLOAD_SIZE);					
+					}				
+					else if(result == 0){
+						printf("codigo retornado: %d\n", result); 
 						empacotaMsg("", msgEnviar, OK, seqRec, 0);
 						printf("ls excutado com sucesso.\n");
 						fflush(stdout);
