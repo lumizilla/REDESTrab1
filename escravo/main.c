@@ -93,49 +93,70 @@ int main(){
 				case 7: {//ls 
 					
 					printf("Recebi um ls: %s\n", dataRec);
-
 					fflush(stdout);
 					if(dataRec[sizeof(dataRec)-1] == 0x0A){
 						dataRec[sizeof(dataRec)-1] = 0x00;
+					}
+					/*getting the first substring*/
+					input = strtok(dataRec, " \n");
+					/*walking trough the other substrings*/
+					i = 0;
+					while(input != NULL){
+						subs[i] = input;
+						input = strtok(NULL, " \n");
+						i = i+1;
+					}
+					strcpy(dataRec, "ls ");
+					for(int j = 1; j < i; j++){
+						strcat(dataRec, subs[j]);
 					}
 					strcat(dataRec, " > ls.txt\n");
 					FILE *fp;
 					fp = fopen("ls.txt", "w");
 					if(system(dataRec) == -1){
 						fprintf(fp, "ERRO: erro ao executar o comando %s\n", dataRec);
-					}
-					//tamanho da mensagem(sem overload) a ser enviada
-					short tamEnv;
-					//mensagem de tamanho do aquivo fica salva aqui
-					unsigned char arqTam[DATA_SIZE];
-					long long int tam_arquivo = tamArquivo("ls.txt");
-					tamEnv = sprintf(arqTam, "%lld", tam_arquivo);
-					//mensagem empacotada de tamanho certo
-					char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
-					empacotaMsg(arqTam, msgEmpacotada, TAM, sequencia, tamEnv);
-					printf("Enviando tamanho %s\n", arqTam);
-					fflush(stdout);
-					write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
-					sequencia = aumentaSeq(sequencia);
-					int aux = 0;
-					while(aux == 0){
-						//TODO fazer timeout do TAM como no T2
-						read(soquete, msgRec, MSG_SIZE);
-						int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-						//aguarda OK
-						if(tipo == OK){
-							//TODO Atualiza timeout
-							printf("OK para escrever, memoria suficiente.\n");
-							enviaArquivo("ls.txt", soquete, tam_arquivo, &sequencia, MOSTRA);
-							aux = -1;
+						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
+						printf("nao permitido: %s\n", msgEnviar);
+						fflush(stdout);
+						write(soquete, msgEnviar, sizeof(NAO_PERMITIDO)+OVERLOAD_SIZE);					
+					}else{
+						empacotaMsg("", msgEnviar, OK, seqRec, 0);
+						printf("ls excutado com sucesso.\n");
+						fflush(stdout);
+						write(soquete, msgEnviar, OVERLOAD_SIZE);
+						//tamanho da mensagem(sem overload) a ser enviada
+						short tamEnv;
+						//mensagem de tamanho do aquivo fica salva aqui
+						unsigned char arqTam[DATA_SIZE];
+						long long int tam_arquivo = tamArquivo("ls.txt");
+						tamEnv = sprintf(arqTam, "%lld", tam_arquivo);
+						//mensagem empacotada de tamanho certo
+						char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
+						empacotaMsg(arqTam, msgEmpacotada, TAM, sequencia, tamEnv);
+						printf("Enviando tamanho %s\n", arqTam);
+						fflush(stdout);
+						write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
+						sequencia = aumentaSeq(sequencia);
+						int aux = 0;
+						while(aux == 0){
+							//TODO fazer timeout do TAM como no T2
+							read(soquete, msgRec, MSG_SIZE);
+							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+							//aguarda OK
+							if(tipo == OK){
+								//TODO Atualiza timeout
+								printf("OK para escrever, memoria suficiente.\n");
+								enviaArquivo("ls.txt", soquete, tam_arquivo, &sequencia, MOSTRA);
+								aux = -1;
+							}
+							//se NACK, reenvia msg
+							else if(tipo == NACK){
+								write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
+								//TODO Atualiza timeout
+							}
 						}
-						//se NACK, reenvia msg
-						else if(tipo == NACK){
-							write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
-							//TODO Atualiza timeout
+						system("rm ls.txt");
 						}
-					}
-					system("rm ls.txt");
 					}
 					break;
 				case 8: //get

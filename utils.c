@@ -71,7 +71,6 @@ long long int checaMemoria(char *path, char* tam){
 
 void apagaRelativos(char *caminho){
 	//TODO aqui ta dando segfault por algum motivo
-	printf("segfault?\n");
 	char *subs[MAX_PATH];
 	/*getting the first substring*/
 	char *input = strtok(caminho, "/");	
@@ -82,13 +81,12 @@ void apagaRelativos(char *caminho){
 		input = strtok(NULL, "/");
 		i = i+1;
 	}
-
 	//se o primeiro elemento eh um ..
-	if(strcmp(subs[1], "..") == 0){
-		subs[1]	= "";
+	if(strcmp(subs[0], "..") == 0){
+		strcpy(subs[0], "");
 	}
-	if(strcmp(subs[1], ".") == 0){
-		subs[1]	= "";
+	if(strcmp(subs[0], ".") == 0){
+		strcpy(subs[0], "");
 	}
 	for(int j = 2; j < i; j++){
 		//se o subs atual eh um .., apagar o path anterior a este que nao eh vazio
@@ -105,7 +103,6 @@ void apagaRelativos(char *caminho){
 			subs[1]	= "";
 		}
 	}
-	printf("segfault?\n");
 	//colocando tudo o que nao eh vazio de volta novamente em uma string
 	char retorno[MAX_DIR*MAX_PATH];
 	strcpy(retorno, "");
@@ -280,12 +277,13 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 
 	//envia pedaco1
 	char pedaco1[DATA_SIZE];
-	int resultado = fread(pedaco1, DATA_SIZE, 1, fp);
+	size_t resultado = fread(pedaco1, 1, sizeof(char)*DATA_SIZE, fp);
+	perror("fread");
 	//TODO testar erros nos fread
-	printf("enviando primeiro pedaco\n");
-	empacotaMsg(pedaco1, mensagem, TIPO, *seq, DATA_SIZE);
+	printf("enviando primeiro pedaco, resultado = %zu\n", resultado);
+	empacotaMsg(pedaco1, mensagem, TIPO, *seq, resultado);
 	*seq = aumentaSeq(*seq);
-	write(soquete, mensagem, MSG_SIZE); 
+	write(soquete, mensagem, (resultado+OVERLOAD_SIZE)); 
 	//aguada ACK desta mensagem antes de continuar
 	bool aux = true;
 	while(aux){	
