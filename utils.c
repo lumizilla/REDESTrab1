@@ -45,26 +45,25 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
-void adicionaAoTimeout(short seq, char *msg, time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX][MSG_SIZE]){
+void adicionaAoTimeout(short seq, char *msg, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	time_t timer;
  	struct tm y2k = {0};
 	double seconds;
-
 	y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
   	y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
 	time(&timer);  // get current time; same as: timer = time(NULL)  
 	seconds = difftime(timer,mktime(&y2k));
-	*listaTime[seq] = seconds+TIMEOUT;
-	strcpy(*mensagens[seq], msg);
+	*listaTime[seq] = (time_t)(seconds+TIMEOUT);	
+	strcpy(mensagens[seq], msg);
 }
 
-void retiraDoTimeout(short seq, time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX][MSG_SIZE]){
+void retiraDoTimeout(short seq, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	*listaTime[seq] = 0;
-	strcpy(*mensagens[seq], "");
+	strcpy(mensagens[seq], "");
 }
 
 //retorna 0 se nao passou do timeout e -1 se passou
-int checaTimeout(short seq, time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX][MSG_SIZE]){
+int checaTimeout(short seq, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//testa se elemento tem timeout	
 	if(*listaTime[seq] == 0){
 		return 0;
@@ -83,13 +82,15 @@ int checaTimeout(short seq, time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX]
 	return -1;
 }
 
-void checaTimeouts(time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX][MSG_SIZE], int soquete){
+void checaTimeouts(time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE], int soquete){
 	for(short i = 0; i < SEQ_MAX; i++){
 		if(checaTimeout(i, listaTime, mensagens) == -1){
+			printf("deu timeout!\n");
+			fflush(stdout);
 			//reenvia a mensagem
-			write(soquete, *mensagens[i], MSG_SIZE);	
+			write(soquete, mensagens[i], MSG_SIZE);	
 			//atualiza o timeout
-			adicionaAoTimeout(i, *mensagens[i], listaTime, mensagens);
+			adicionaAoTimeout(i, mensagens[i], listaTime, mensagens);
 		}
 	}
 	return;

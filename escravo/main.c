@@ -27,8 +27,12 @@ int main(){
 	/*VARIAVEIS DO TIMEOUT */
 	//lista com o tempo de cada uma das msgs aguardando timeout, cara posicao=id
 	time_t *listaTime[SEQ_MAX];
+
+	for(int k = 0;k<SEQ_MAX;++k){
+		listaTime[k] =	malloc(sizeof(time_t));	
+	}
 	//lista com as mensagens relativas ao timeout
-	char *mensagens[SEQ_MAX][MSG_SIZE];
+	char mensagens[SEQ_MAX][MSG_SIZE];
 	
 	//auxiliares
 	int i;
