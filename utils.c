@@ -556,7 +556,6 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 			//recebe primeiro pedaco
 			read(soquete, msgRec, MSG_SIZE);
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-			printf("tamRec = %hu\n", tamRec);
 			//se nao houve erro de paridade e nem de inicio	
 			if(status == 0 && tipo == DADO){
 				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
@@ -773,12 +772,12 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 	else if(TIPO == MOSTRA){
 		//recebe seq do primeiro pedaco recebido
 		int janelaInicio;
-
 		while(true){	
 			//recebe primeiro pedaco
 			read(soquete, msgRec, MSG_SIZE);
+			strcpy(dataRec, "");
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-
+			dataRec[sizeof(dataRec)] = 0x00;
 			//se nao houve erro de paridade e nem de inicio	
 			if(status == 0 && tipo == MOSTRA){
 				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
@@ -801,12 +800,13 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 		}
 		int janelaFim = aumentaSeq(janelaInicio);
 		janelaFim = aumentaSeq(janelaFim);
-		printf("tam arquivo %lld\n", tamArq);
 		//enquanto nao tiver recebido todos os pedacos
 		while(tamArq > 0){
 			//recebe pedaco
 			read(soquete, msgRec, MSG_SIZE);
+			strcpy(dataRec, "");
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+			dataRec[sizeof(dataRec)] = 0x00;
 			//printf("recebi msg de sequencia - %hu", seqRec);
 			//SE MENSAGEM FOI RECEBIDA COM ERRO, ENVIA NACK
 			if(status == -2){
@@ -971,6 +971,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 		while(true){
 			//recebe msg
 			read(soquete, msgRec, MSG_SIZE);
+			strcpy(dataRec, "");
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 			if(status == 0){
 				//SE PEDACO ESTA FORA DA JANELA E JA FOI RECEBIDO
@@ -982,7 +983,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 				}		
 				//se msg == FIM, envia OK
 				else if(tipo == FIM){
-					printf("recebi fim \n");	
+					printf("\nOK: recebi fim \n");	
 					//envia OK
 					empacotaMsg("", msgStatus, OK, seqRec, 0);
 					write(soquete, msgStatus, OVERLOAD_SIZE); 
