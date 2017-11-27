@@ -19,16 +19,18 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete){
 		if(seqRec == seqMsg && status == 0){
 			//aguarda OK
 			if(tipo == OK){
+				//TODO atualiza timeout
 				printf("OK: Servidor mudou de diretorio com sucesso.\n");
 				return;
 			}
 			//se NACK, reenvia msg
 			else if(tipo == NACK){
+				//TODO Adiciona ao timeout
 				write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
-				//TODO Atualiza timeout
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
+				//TODO atualiza timeout
 				printf("%s\n", dataRec);
 				fflush(stdout);
 				if(strcmp(dataRec, NAO_EXISTE) == 0){
@@ -70,7 +72,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 		if(seqRec == seqMsg){
 			//aguarda OK
 			if(tipo == OK){
-				//TODO Atualiza timeout
+				//TODO Atualiza ao timeout
 				printf("OK: Servidor aceitou o comando de PUT, iniciando troca de arquivos...\n");
 				//envia tamanho do arquivo em bytes a ser enviado
 				long long int tam_arquivo = tamArquivo(arquivo);
@@ -80,6 +82,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 						//mensagem empacotada de tamanho certo
 						char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
 						empacotaMsg(arqTam, msgEmpacotada, TAM, *seq, tamEnv);
+						//TODO adiciona ao timeout			
 						printf("Enviando tamanho %s\n", arqTam);
 						fflush(stdout);
 						write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
@@ -103,6 +106,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 							}
 							//se ERRO, printa erro
 							else if(tipo == ERRO){
+								//TODO Atualiza timeout
 								//unico erro que a mensagem de tam pode gerar eh de espaco
 								if(strcmp(dataRec, NAO_ESPACO)){
 									printf("ERRO NO SERVIDOR: Espaço insuficiente.\n");
@@ -124,6 +128,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
+				//TODO Atualiza timeout
 				//unico erro que a mensagem de put inicial pode gerar eh de permissao
 				if(strcmp(dataRec, NAO_PERMITIDO)){
 					printf("ERRO NO SERVIDOR: Permissao negada.\n");
@@ -154,12 +159,15 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 		if(seqRec == seqMsg && status == 0){
 			//aguarda OK
 			if(tipo == OK){
+				//TODO Atualiza timeout
 				printf("OK: Servidor aceitou o get. Recebendo tamanho...\n");
 				while(true){
 					//recebe tamanho
+					//TODO checa timeouts
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
+						//TODO Atualiza timeout
 						printf("OK: Tamanho recebido com sucesso\n");
 						//checa se pode escrever arquivo deste tamanho
 						//se nao tem memoria suficiente, responde com ERRO
@@ -183,6 +191,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 					}
 					else if(tipo != TAM || status == -2){
 						//responde com NACK
+						//TODO fazer timeout como no T2
 						empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 						write(soquete, msgEnviar, OVERLOAD_SIZE);
 					}
@@ -195,6 +204,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 			}
 			//se ERRO, printa erro
 			else if(tipo == ERRO){
+				//TODO Atualiza timeout
 				printf("%s\n", dataRec);
 				fflush(stdout);
 				if(strcmp(dataRec, NAO_PERMITIDO) == 0){
@@ -229,8 +239,10 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 		if(seqRec == seqMsg && status == 0){
 			//aguarda OK
 			if(tipo == OK){
+				//TODO Atualiza timeout
 				printf("OK: Servidor aceitou ls, aguardando TAM do ls.\n");
 				while(true){
+					//TODO fazer timeout como no T2
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
@@ -248,12 +260,15 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 				//TODO Atualiza timeout
 			}
 			else if(strcmp(dataRec, NAO_PERMITIDO) == 0){
+				//TODO Atualiza timeout
 				printf("ERRO NO SERVIDOR: Permissao negada.\n");
+				return;			
 			}
 			else if(strcmp(dataRec, NAO_EXISTE) == 0){
+				//TODO Atualiza timeout
 				printf("ERRO NO SERVIDOR: Arquivo nao existe.\n");
+				return;
 			}
-			return;
 		}
 	}
 }
@@ -290,6 +305,19 @@ int main(){
 	//guarda o PATH do diretorio corrente
 	char path[MAX_INPUT] = "./";
 
+	/*VARIAVEIS DO TIMEOUT */
+	//lista com o tempo de cada uma das msgs aguardando timeout, cara posicao=id
+	time_t listaTime[SEQ_MAX];
+	//lista com as mensagens relativas ao timeout
+	char mensagens[SEQ_MAX][MSG_SIZE];
+/*
+  //Para o timeout:
+  //toda a vez que eu for enviar/reenviar uma mensagem, atualizar as duas listas
+  //fazer com que o recebimento de mensagens seja interrompido para checar os
+  //timeouts
+  time(&timer);  // get current time; same as: timer = time(NULL)  
+  seconds = difftime(timer,mktime(&y2k));
+*/
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
 	printf("lls 'opcoes': ls local\n");
@@ -387,6 +415,7 @@ int main(){
 				//mensagem empacotada de tamanho certo
 				char msgResto[tamMsg+OVERLOAD_SIZE];
 				empacotaMsg(comando, msgResto, tipo, sequencia, tamMsg);
+				//TODO Adiciona ao timeout
 				write(soquete, msgResto, (tamMsg+OVERLOAD_SIZE));
 				sequencia = aumentaSeq(sequencia);
 

@@ -15,6 +15,7 @@
 #include <arpa/inet.h>
 #include <math.h>
 #include <errno.h>
+#include <time.h>
 
 //esse eh o tamanho maximo de uma mensagem em bytes, 
 //considerando que tenham 31 bytes de dados
@@ -60,6 +61,9 @@
 #define NAO_EXISTE "1"
 #define NAO_PERMITIDO "2"
 #define NAO_ESPACO "3"
+
+//timeout (em segundos)
+#define TIMEOUT 3
 
 typedef struct cont {
 	unsigned short tam : 5,
