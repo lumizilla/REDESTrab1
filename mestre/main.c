@@ -231,8 +231,6 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 	//msg de ACK/NACK/OK etc
 	unsigned char msgStatus[OVERLOAD_SIZE];
 	while (true) {
-		printf("dentro do tratals\n");
-		fflush(stdout);
 		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
@@ -421,8 +419,6 @@ int main(){
 				char msgResto[tamMsg+OVERLOAD_SIZE];
 				empacotaMsg(comando, msgResto, tipo, sequencia, tamMsg);
 				adicionaAoTimeout(sequencia, msgResto, listaTime, mensagens);
-				printf("aquiiiii\n");
-				fflush(stdout);
 				write(soquete, msgResto, (tamMsg+OVERLOAD_SIZE));
 				sequencia = aumentaSeq(sequencia);
 
