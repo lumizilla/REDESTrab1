@@ -234,13 +234,10 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete) {
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
-						empacotaMsg("", msgStatus, ACK, seqRec, 0);
+						empacotaMsg("", msgStatus, OK, seqRec, 0);
 						write(soquete, msgStatus, OVERLOAD_SIZE);
 						printf("Recebendo ls remoto...\n");
 						recebeArquivo("ls.txt", soquete, atoll(dataRec), MOSTRA);
-						system("cat ls.txt");
-						fflush(stdout);
-						remove("ls.txt");
 						return;
 					}
 				}

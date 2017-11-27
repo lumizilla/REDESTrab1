@@ -558,7 +558,7 @@ int recebeArquivo(char *arquivo, int soquete, long long int tamArq, int TIPO){
 			//recebe primeiro pedaco
 			read(soquete, msgRec, MSG_SIZE);
 			int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
-
+			printf("tamRec = %hu\n", tamRec);
 			//se nao houve erro de paridade e nem de inicio	
 			if(status == 0 && tipo == DADO){
 				//printf("recebi primeiro pedaco e estou enviando ACK no num de seq %d\n", seqRec);
