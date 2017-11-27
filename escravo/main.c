@@ -110,9 +110,9 @@ int main(){
 					for(int j = 1; j < i; j++){
 						strcat(dataRec, subs[j]);
 					}
-					strcat(dataRec, " > ls.txt\n");
 					FILE *fp;
 					fp = fopen("ls.txt", "w");
+					strcat(dataRec, " > ls.txt\n");
 					if(system(dataRec) == -1){
 						fprintf(fp, "ERRO: erro ao executar o comando %s\n", dataRec);
 						empacotaMsg(NAO_PERMITIDO, msgEnviar, ERRO, seqRec, sizeof(NAO_PERMITIDO));
