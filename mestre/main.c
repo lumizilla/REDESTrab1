@@ -134,7 +134,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	}
 }
 
-void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo){
+void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *nomeArq){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -164,17 +164,24 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 						//checa se pode escrever arquivo deste tamanho
 						//se nao tem memoria suficiente, responde com ERRO
 						if(checaMemoria("./", dataRec) == 0){
+							//se tem memoria suficiente, responde com ACK
+							empacotaMsg("", msgEnviar, OK, seqRec, 0);
+							dataRec[tamRec] = 0x00;
+							printf("tem espaco para escrever arq de tam: %s\n", dataRec);
+							fflush(stdout);
+							write(soquete, msgEnviar, OVERLOAD_SIZE);
+							recebeArquivo(nomeArq, soquete, atoll(dataRec), DADO);
+							return;
+						}else{
+							//se nao tem memoria suficiente, responde com ERRO
 							empacotaMsg(NAO_ESPACO, msgEnviar, ERRO, seqRec, sizeof(NAO_ESPACO));
-							printf("ERRO: nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
+							printf("nao tem espaco para escrever arq de tam: %s\n", msgEnviar);
 							fflush(stdout);
 							write(soquete, msgEnviar, sizeof(NAO_ESPACO)+OVERLOAD_SIZE);
 							return;
-						}else{
-							recebeArquivo(arquivo, soquete, atoll(dataRec), DADO);
-							return;
 						}
 					}
-					else if(tipo != TAM || statues == -2){
+					else if(tipo != TAM || status == -2){
 						//responde com NACK
 						empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 						write(soquete, msgEnviar, OVERLOAD_SIZE);
@@ -394,11 +401,11 @@ int main(){
 						break;
 					//put
 					case 9:
-						trataPUT(msgResto, sequencia-1, tamMsg, soquete, &sequencia, subs[1]);
+						trataPUT(msgResto, diminuiSeq(sequencia), tamMsg, soquete, &sequencia, subs[1]);
 						break;
 					case 8:
 					//get
-						trataGET(msgResto, sequencia-1, tamMsg, soquete, subs[1]);
+						trataGET(msgResto, diminuiSeq(sequencia), tamMsg, soquete, &sequencia, subs[1]);
 						break;
 					default:
 						printf("ERRO: Tipo de mensagem nao esperado");

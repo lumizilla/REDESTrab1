@@ -27,6 +27,9 @@ int main(){
 	//auxiliares
 	int i;
 
+	//nome do arquivo a ser enviadorecebido
+	char nomeArq[FILE_NAME];
+	
 	unsigned char msgEnviar[MSG_SIZE];
 	while(true){
 		//recebe mensagem
@@ -101,7 +104,6 @@ int main(){
 					if(system(dataRec) == -1){
 						fprintf(fp, "ERRO: erro ao executar o comando %s\n", dataRec);
 					}
-					//TODO enviar TAM
 					//tamanho da mensagem(sem overload) a ser enviada
 					short tamEnv;
 					//mensagem de tamanho do aquivo fica salva aqui
@@ -138,7 +140,7 @@ int main(){
 					break;
 				case 8: //get
 					//TODO Responde com ACK/ERRO, se foi um ACK enviar o TAM do arquivo e os dados e o OK
-					printf("Recebi um put: %s\n", dataRec);
+					printf("Recebi um get: %s\n", dataRec);
 					fflush(stdout);
 					/*getting the first substring*/
 					input = strtok(dataRec, " \n");
@@ -149,7 +151,6 @@ int main(){
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
-					char nomeArq[FILE_NAME];
 					strcpy(nomeArq, subs[1]);
 					//checa se pode ler deste diretorio
 					if(access("./", R_OK) == 0){
@@ -160,8 +161,44 @@ int main(){
 							fflush(stdout);
 							write(soquete, msgEnviar, OVERLOAD_SIZE);
 							//se foi um OK, envia o tamanho do arquivo
-							while(true){
-							
+							long long int tam_arquivo = tamArquivo(nomeArq);
+							//mensagem de tamanho do aquivo fica salva aqui
+							unsigned char arqTam[DATA_SIZE];
+							short tamEnv = sprintf(arqTam, "%lld", tam_arquivo);
+							if(tam_arquivo != -1){
+								//mensagem empacotada de tamanho certo
+								char msgEmpacotada[tamEnv+OVERLOAD_SIZE];
+								empacotaMsg(arqTam, msgEmpacotada, TAM, sequencia, tamEnv);
+								printf("Enviando tamanho %s\n", arqTam);
+								fflush(stdout);
+								write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
+								sequencia = aumentaSeq(sequencia);
+								while(true){
+									//TODO fazer timeout do TAM como no T2
+									read(soquete, msgRec, MSG_SIZE);
+									int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
+									//aguarda OK
+									if(tipo == OK){
+										//TODO Atualiza timeout
+										printf("OK para escrever, memoria suficiente.\n");
+										enviaArquivo(nomeArq, soquete, tam_arquivo, &sequencia, DADO);
+										//TODO deletar arquivo desta maquina
+										break;
+									}
+									//se NACK, reenvia msg
+									else if(tipo == NACK){
+										write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
+										//TODO Atualiza timeout
+									}
+									//se ERRO, printa erro
+									else if(tipo == ERRO){
+										//unico erro que a mensagem de tam pode gerar eh de espaco
+										if(strcmp(dataRec, NAO_ESPACO)){
+											printf("ERRO NO SERVIDOR: Espaço insuficiente.\n");
+										}
+										break;
+									}
+								}
 							}
 						}else{
 							empacotaMsg(NAO_EXISTE, msgEnviar, ERRO, seqRec, sizeof(NAO_EXISTE));
@@ -188,7 +225,6 @@ int main(){
 						input = strtok(NULL, " \n");
 						i = i+1;
 					}
-					char nomeArq[FILE_NAME];
 					strcpy(nomeArq, subs[1]);
 					//checa se pode escrever neste diretorio
 					if(access("./", W_OK) == 0){
