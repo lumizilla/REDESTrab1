@@ -1,7 +1,7 @@
 #include "../utils.c"
 //um char tem 1 byte = 8 bits
 
-void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -45,7 +45,7 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTi
 	}
 }
 
-void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
@@ -139,7 +139,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	}
 }
 
-void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *nomeArq, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *nomeArq, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -216,7 +216,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	}
 }
 
-void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]) {
+void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]) {
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -307,10 +307,10 @@ int main(){
 
 	/*VARIAVEIS DO TIMEOUT */
 	//lista com o tempo de cada uma das msgs aguardando timeout, cara posicao=id
-	time_t *listaTime[SEQ_MAX];
+	double *listaTime[SEQ_MAX];
 
 	for(int k = 0;k<SEQ_MAX;++k){
-		listaTime[k] =	malloc(sizeof(time_t));	
+		listaTime[k] =	malloc(sizeof(double));	
 	}
 	//lista com as mensagens relativas ao timeout
 	char mensagens[SEQ_MAX][MSG_SIZE];
