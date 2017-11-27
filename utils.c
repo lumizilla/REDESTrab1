@@ -278,7 +278,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 	char pedaco1[DATA_SIZE];
 	size_t resultado = fread(pedaco1, 1, sizeof(char)*DATA_SIZE, fp);
 	//TODO testar erros nos fread
-	printf("enviando primeiro pedaco, resultado = %zu, pedaco1= %s\n", resultado, pedaco1);
 	empacotaMsg(pedaco1, mensagem, TIPO, *seq, resultado);
 	*seq = aumentaSeq(*seq);
 	write(soquete, mensagem, (resultado+OVERLOAD_SIZE)); 
@@ -310,7 +309,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 		//TODO testar erros nos fread
 		empacotaMsg(pedaco2, mensagem, TIPO, *seq, resultado);
 		*seq = aumentaSeq(*seq);
-		printf("printf pedaco2=%s", pedaco2);
 		write(soquete, mensagem, MSG_SIZE); 
 	}
 	char pedaco3[DATA_SIZE];
@@ -320,7 +318,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 		//TODO testar erros nos fread
 		empacotaMsg(pedaco3, mensagem, TIPO, *seq, resultado);
 		*seq = aumentaSeq(*seq);
-		printf("printf pedaco3=%s", pedaco3);
 		write(soquete, mensagem, MSG_SIZE); 
 	}
 	if(!feof(fp)){
@@ -334,7 +331,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 		write(soquete, mensagem, MSG_SIZE); 
 		janelaInicio = aumentaSeq(janelaInicio);
 		janelaFim = aumentaSeq(janelaFim);
-		printf("janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 	}
 	//enquanto nao tiver enviado tudo
 	while(!feof(fp)){
@@ -356,7 +352,6 @@ int enviaArquivo(char *arquivo, int soquete, long long int tamArq, short *seq, i
 					write(soquete, mensagem, MSG_SIZE); 
 					janelaInicio = aumentaSeq(janelaInicio);
 					janelaFim = aumentaSeq(janelaFim);
-					printf("recebi ack pedaco1, janela inicio %d, janela fim %d\n", janelaInicio, janelaFim);
 				}
 				//se mensagem = ACK pedaco2
 				else if(seqRec == aumentaSeq(janelaInicio)){
