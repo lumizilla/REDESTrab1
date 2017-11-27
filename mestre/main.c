@@ -13,7 +13,7 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTi
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 	while(true){
-		//TODO fazer timeout como no T2
+		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -65,7 +65,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	unsigned char arqTam[DATA_SIZE];
 
 	while(true){
-		//TODO fazer timeout do put como no T2
+		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 
@@ -88,12 +88,12 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 						write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
 						*seq = aumentaSeq(*seq);
 						while(true){
-							//TODO fazer timeout do TAM como no T2
+							checaTimeouts(listaTime, mensagens, soquete);
 							read(soquete, msgRec, MSG_SIZE);
 							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 							//aguarda OK
 							if(tipo == OK){
-								retiraDoTimeout(*seq, listaTime, mensagens);
+								retiraDoTimeout(diminuiSeq(*seq), listaTime, mensagens);
 								printf("OK para escrever, memoria suficiente.\n");
 								enviaArquivo(arquivo, soquete, tam_arquivo, seq, DADO);
 								//TODO deletar arquivo desta maquina
@@ -102,11 +102,11 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 							//se NACK, reenvia msg
 							else if(tipo == NACK){
 								write(soquete, msg, (tamMsg+OVERLOAD_SIZE));
-								adicionaAoTimeout(*seq, msgEmpacotada, listaTime, mensagens);
+								adicionaAoTimeout(diminuiSeq(*seq), msgEmpacotada, listaTime, mensagens);
 							}
 							//se ERRO, printa erro
 							else if(tipo == ERRO){
-								retiraDoTimeout(*seq, listaTime, mensagens);
+								retiraDoTimeout(diminuiSeq(*seq), listaTime, mensagens);
 								//unico erro que a mensagem de tam pode gerar eh de espaco
 								if(strcmp(dataRec, NAO_ESPACO)){
 									printf("ERRO NO SERVIDOR: Espaço insuficiente.\n");
@@ -153,7 +153,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 
 	unsigned char msgEnviar[MSG_SIZE];
 	while(true){
-		//TODO fazer timeout como no T2
+		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -163,7 +163,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				printf("OK: Servidor aceitou o get. Recebendo tamanho...\n");
 				while(true){
 					//recebe tamanho
-					//TODO checa timeouts
+					checaTimeouts(listaTime, mensagens, soquete);
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
@@ -231,7 +231,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTi
 	//msg de ACK/NACK/OK etc
 	unsigned char msgStatus[OVERLOAD_SIZE];
 	while (true) {
-		//TODO fazer timeout como no T2
+		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -240,7 +240,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, time_t *listaTi
 				retiraDoTimeout(seqMsg, listaTime, mensagens);
 				printf("OK: Servidor aceitou ls, aguardando TAM do ls.\n");
 				while(true){
-					//TODO fazer timeout como no T2
+					checaTimeouts(listaTime, mensagens, soquete);
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){

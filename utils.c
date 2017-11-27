@@ -83,6 +83,18 @@ int checaTimeout(short seq, time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX]
 	return -1;
 }
 
+void checaTimeouts(time_t *listaTime[SEQ_MAX], char *mensagens[SEQ_MAX][MSG_SIZE], int soquete){
+	for(short i = 0; i < SEQ_MAX; i++){
+		if(checaTimeout(i, listaTime, mensagens) == -1){
+			//reenvia a mensagem
+			write(soquete, *mensagens[i], MSG_SIZE);	
+			//atualiza o timeout
+			adicionaAoTimeout(i, *mensagens[i], listaTime, mensagens);
+		}
+	}
+	return;
+}
+
 //retona o tam de um arquivo em bytes
 long long int tamArquivo(char *filename) {
     struct stat st; 
