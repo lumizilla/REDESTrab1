@@ -42,12 +42,28 @@ int ConexaoRawSocket(char *device)
     exit(-1);
   }
 
+   //timeout de read/write
+    struct timeval timeout;      
+    timeout.tv_sec = 10;
+    timeout.tv_usec = 0;
+
+  if (setsockopt (soquete, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+     printf("setsockopt failed\n");
+     exit(-1);
+  }
+  /*if (setsockopt (soquete, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout, sizeof(timeout)) < 0){
+    printf("setsockopt failed\n");
+    exit(-1);
+  }*/
+
+
   return soquete;
 }
 
 void adicionaAoTimeout(short seq, char *msg, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	unsigned long seconds = (unsigned long)time(NULL);
 	*listaTime[seq] = seconds+TIMEOUT;	
+	printf("add ao timeout, seq %hu, timeout %ld\n", seq, *listaTime[seq]);
 	strcpy(mensagens[seq], msg);
 }
 
@@ -59,13 +75,15 @@ void retiraDoTimeout(short seq, unsigned long *listaTime[SEQ_MAX], char mensagen
 //retorna 0 se nao passou do timeout e -1 se passou
 int checaTimeout(short seq, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//testa se elemento tem timeout	
+	//printf("lista time da seq :%ld, atual %ld\n", *listaTime[seq], (unsigned long)time(NULL));	
 	if(*listaTime[seq] == 0){
 		return 0;
 	}
 	unsigned long seconds = (unsigned long)time(NULL);
-	if(*listaTime[seq] < seconds){
+	if(*listaTime[seq] > seconds){
 		return 0;
 	}
+	printf("retornando -1\n");
 	return -1;
 }
 

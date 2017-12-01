@@ -321,9 +321,7 @@ int main(){
   time(&timer);  // get current time; same as: timer = time(NULL)  
   seconds = difftime(timer,mktime(&y2k));
 */
-fprintf(stdout, "%lu\n", (unsigned long)time(NULL)); 
-sleep(3);
-fprintf(stdout, "%lu\n", (unsigned long)time(NULL)); 
+
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
 	printf("lls 'opcoes': ls local\n");
