@@ -63,7 +63,7 @@
 #define NAO_ESPACO "3"
 
 //timeout (em segundos)
-#define TIMEOUT 10.0
+#define TIMEOUT 10
 
 typedef struct cont {
 	unsigned short tam : 5,
