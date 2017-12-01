@@ -73,6 +73,7 @@ void checaTimeouts(unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MS
 	for(short i = 0; i < SEQ_MAX; i++){
 		if(checaTimeout(i, listaTime, mensagens) == -1){
 			//reenvia a mensagem
+			printf("timeout da mensagem de seq %hu, reenviando\n", i);
 			write(soquete, mensagens[i], MSG_SIZE);	
 			//atualiza o timeout
 			adicionaAoTimeout(i, mensagens[i], listaTime, mensagens);
