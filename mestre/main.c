@@ -1,7 +1,7 @@
 #include "../utils.c"
 //um char tem 1 byte = 8 bits
 
-void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -13,7 +13,6 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 	//tipo de mensagem a ser enviada/recebida
 	short tipo = 0;
 	while(true){
-		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -42,10 +41,11 @@ void trataCD(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 				return;
 			}
 		}
+		checaTimeouts(listaTime, mensagens, soquete);
 	}
 }
 
-void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *arquivo, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//VARIAVEIS A RESPEITO DE MENSAGENS RECEBIDAS
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
@@ -65,7 +65,6 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 	unsigned char arqTam[DATA_SIZE];
 
 	while(true){
-		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 
@@ -88,7 +87,6 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 						write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
 						*seq = aumentaSeq(*seq);
 						while(true){
-							checaTimeouts(listaTime, mensagens, soquete);
 							read(soquete, msgRec, MSG_SIZE);
 							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 							//aguarda OK
@@ -113,6 +111,7 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 								}
 								return;
 							}
+							checaTimeouts(listaTime, mensagens, soquete);
 						}
 					}
 				}
@@ -136,10 +135,11 @@ void trataPUT(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				return;
 			}
 		}
+		checaTimeouts(listaTime, mensagens, soquete);
 	}
 }
 
-void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *nomeArq, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, char *nomeArq, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -153,7 +153,6 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 
 	unsigned char msgEnviar[MSG_SIZE];
 	while(true){
-		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -163,7 +162,6 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				printf("OK: Servidor aceitou o get. Recebendo tamanho...\n");
 				while(true){
 					//recebe tamanho
-					checaTimeouts(listaTime, mensagens, soquete);
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
@@ -193,6 +191,7 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 						empacotaMsg("", msgEnviar, NACK, seqRec, 0);
 						write(soquete, msgEnviar, OVERLOAD_SIZE);
 					}
+					checaTimeouts(listaTime, mensagens, soquete);
 				}
 			}
 			//se NACK, reenvia msg
@@ -213,10 +212,11 @@ void trataGET(char *msg, short seqMsg, short tamMsg, int soquete, short *seq, ch
 				return;
 			}
 		}
+		checaTimeouts(listaTime, mensagens, soquete);
 	}
 }
 
-void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]) {
+void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]) {
 	//mensagem recebida
 	unsigned char msgRec[MSG_SIZE];
 	//bits de DADOS da msg recebida
@@ -231,7 +231,6 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 	//msg de ACK/NACK/OK etc
 	unsigned char msgStatus[OVERLOAD_SIZE];
 	while (true) {
-		checaTimeouts(listaTime, mensagens, soquete);
 		read(soquete, msgRec, MSG_SIZE);
 		int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 		if(seqRec == seqMsg && status == 0){
@@ -240,7 +239,6 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 				retiraDoTimeout(seqMsg, listaTime, mensagens);
 				printf("OK: Servidor aceitou ls, aguardando TAM do ls.\n");
 				while(true){
-					checaTimeouts(listaTime, mensagens, soquete);
 					read(soquete, msgRec, MSG_SIZE);
 					int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 					if(tipo == TAM && status == 0){
@@ -250,6 +248,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 						recebeArquivo("ls.txt", soquete, atoll(dataRec), MOSTRA);
 						return;
 					}
+					checaTimeouts(listaTime, mensagens, soquete);
 				}
 			}
 			//se NACK, reenvia msg
@@ -268,6 +267,7 @@ void trataLS(char *msg, short seqMsg, short tamMsg, int soquete, double *listaTi
 				return;
 			}
 		}
+		checaTimeouts(listaTime, mensagens, soquete);
 	}
 }
 
@@ -305,10 +305,10 @@ int main(){
 
 	/*VARIAVEIS DO TIMEOUT */
 	//lista com o tempo de cada uma das msgs aguardando timeout, cara posicao=id
-	double *listaTime[SEQ_MAX];
+	unsigned long *listaTime[SEQ_MAX];
 
 	for(int k = 0;k<SEQ_MAX;++k){
-		listaTime[k] =	malloc(sizeof(double));	
+		listaTime[k] =	malloc(sizeof(unsigned long));	
 	}
 	//lista com as mensagens relativas ao timeout
 	char mensagens[SEQ_MAX][MSG_SIZE];
@@ -321,6 +321,9 @@ int main(){
   time(&timer);  // get current time; same as: timer = time(NULL)  
   seconds = difftime(timer,mktime(&y2k));
 */
+fprintf(stdout, "%lu\n", (unsigned long)time(NULL)); 
+sleep(3);
+fprintf(stdout, "%lu\n", (unsigned long)time(NULL)); 
 	printf("--------------------x--------------------\n");
 	printf("Minishell - Como usar\n");
 	printf("lls 'opcoes': ls local\n");

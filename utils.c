@@ -45,44 +45,31 @@ int ConexaoRawSocket(char *device)
   return soquete;
 }
 
-void adicionaAoTimeout(short seq, char *msg, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
-	time_t timer;
- 	struct tm y2k = {0};
-	double seconds;
-	y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
-  	y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
-	time(&timer);  // get current time; same as: timer = time(NULL)  
-	seconds = difftime(timer,mktime(&y2k));
+void adicionaAoTimeout(short seq, char *msg, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+	unsigned long seconds = (unsigned long)time(NULL);
 	*listaTime[seq] = seconds+TIMEOUT;	
 	strcpy(mensagens[seq], msg);
 }
 
-void retiraDoTimeout(short seq, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+void retiraDoTimeout(short seq, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	*listaTime[seq] = 0;
 	strcpy(mensagens[seq], "");
 }
 
 //retorna 0 se nao passou do timeout e -1 se passou
-int checaTimeout(short seq, double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
+int checaTimeout(short seq, unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE]){
 	//testa se elemento tem timeout	
 	if(*listaTime[seq] == 0){
 		return 0;
 	}
-	time_t timer;
-	struct tm y2k = {0};
-	double seconds;
-
-	y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
-	y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
-	time(&timer);  // get current time; same as: timer = time(NULL)  
-	seconds = difftime(timer,mktime(&y2k));
+	unsigned long seconds = (unsigned long)time(NULL);
 	if(*listaTime[seq] < seconds){
 		return 0;
 	}
 	return -1;
 }
 
-void checaTimeouts(double *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE], int soquete){
+void checaTimeouts(unsigned long *listaTime[SEQ_MAX], char mensagens[SEQ_MAX][MSG_SIZE], int soquete){
 	for(short i = 0; i < SEQ_MAX; i++){
 		if(checaTimeout(i, listaTime, mensagens) == -1){
 			//reenvia a mensagem

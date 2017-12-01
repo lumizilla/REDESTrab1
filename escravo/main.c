@@ -26,10 +26,10 @@ int main(){
 	
 	/*VARIAVEIS DO TIMEOUT */
 	//lista com o tempo de cada uma das msgs aguardando timeout, cara posicao=id
-	double *listaTime[SEQ_MAX];
+	unsigned long *listaTime[SEQ_MAX];
 
 	for(int k = 0;k<SEQ_MAX;++k){
-		listaTime[k] =	malloc(sizeof(double));	
+		listaTime[k] =	malloc(sizeof(unsigned long));	
 	}
 	//lista com as mensagens relativas ao timeout
 	char mensagens[SEQ_MAX][MSG_SIZE];
@@ -155,7 +155,6 @@ int main(){
 						sequencia = aumentaSeq(sequencia);
 						int aux = 0;
 						while(aux == 0){
-							checaTimeouts(listaTime, mensagens, soquete);
 							read(soquete, msgRec, MSG_SIZE);
 							int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 							if(status == 0){
@@ -172,6 +171,7 @@ int main(){
 									adicionaAoTimeout(diminuiSeq(sequencia), msgEmpacotada, listaTime, mensagens);
 								}
 							}
+							checaTimeouts(listaTime, mensagens, soquete);
 						}
 						system("rm ls.txt");
 						}
@@ -214,7 +214,6 @@ int main(){
 								write(soquete, msgEmpacotada, (tamEnv+OVERLOAD_SIZE));
 								sequencia = aumentaSeq(sequencia);
 								while(true){
-									checaTimeouts(listaTime, mensagens, soquete);
 									read(soquete, msgRec, MSG_SIZE);
 									int status = desempacotaMsg(msgRec, dataRec, &seqRec, &tamRec, &tipo);
 									if(status == 0){						
@@ -241,6 +240,7 @@ int main(){
 											break;
 										}
 									}
+									checaTimeouts(listaTime, mensagens, soquete);
 								}
 							}
 						}else{
